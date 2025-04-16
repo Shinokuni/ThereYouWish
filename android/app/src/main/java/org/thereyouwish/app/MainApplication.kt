@@ -1,4 +1,4 @@
-package com.thereyouwish
+package org.thereyouwish.app
 
 import android.app.Application
 import com.facebook.react.PackageList

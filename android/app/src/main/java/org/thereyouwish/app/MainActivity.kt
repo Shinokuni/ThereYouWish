@@ -1,4 +1,4 @@
-package com.thereyouwish
+package org.thereyouwish.app
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
