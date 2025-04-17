@@ -12,14 +12,15 @@
   "dependencies": {
     "@react-navigation/native": "^7.1.6",
     "@react-navigation/native-stack": "^7.3.10",
+    "babel-plugin-inline-import": "^3.0.0",
     "drizzle-orm": "^0.42.0",
     "expo": "^52.0.46",
+    "expo-constants": "~17.0.8",
     "expo-sqlite": "~15.1.4",
     "react": "18.2.0",
     "react-native": "0.77.2",
     "react-native-safe-area-context": "^5.4.0",
-    "react-native-screens": "^4.10.0",
-    "expo-constants": "~17.0.8"
+    "react-native-screens": "^4.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -35,6 +36,7 @@
     "@types/jest": "^29.5.13",
     "@types/react": "^18.2.0",
     "@types/react-test-renderer": "^18.2.0",
+    "drizzle-kit": "^0.31.0",
     "eslint": "^8.19.0",
     "jest": "^29.6.3",
     "prettier": "2.8.8",
@@ -49,7 +51,6 @@
       "exclude": [
         "expo-keep-awake",
         "expo-application",
-        "expo-asset",
         "expo-file-system",
         "expo-font",
         "expo-keep-awake"
