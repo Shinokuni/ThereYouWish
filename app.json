@@ -1,4 +1,7 @@
 {
   "name": "ThereYouWish",
-  "displayName": "ThereYouWish"
+  "displayName": "ThereYouWish",
+  "plugins": [
+    "expo-sqlite"
+  ]
 }
