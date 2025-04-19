@@ -1,10 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {Button, SafeAreaView, Text} from 'react-native';
+import {SafeAreaView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Collection, collection} from '../../db/schema';
+import {Appbar, FAB} from 'react-native-paper';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
+
+import {Collection, collection} from '../../db/schema';
 import * as schema from '../../db/schema';
+import style from './style';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -16,12 +19,11 @@ const HomeScreen = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        await database
+        /* await database
           .insert(collection)
-          .values({name: 'collection 1', description: 'this is a description'});
+          .values({name: 'collection 1', description: 'this is a description'}); */
 
         const test = await database.select().from(collection);
-        console.log(test);
         setCollections(test);
       } catch (error) {
         console.log(error);
@@ -38,15 +40,16 @@ const HomeScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView>
-      <Text>Home Screen!</Text>
+    <SafeAreaView style={{flex: 1}}>
+      <Appbar.Header>
+        <Appbar.Content title="Wishes" />
+      </Appbar.Header>
 
-      <Button
-        title={'New wish'}
+      <FAB
+        style={style.fab}
+        icon={'plus'}
         onPress={() => navigation.navigate('NewWish')}
       />
-
-      {collections.length > 0 && <Text>{collections[0].name}</Text>}
     </SafeAreaView>
   );
 };

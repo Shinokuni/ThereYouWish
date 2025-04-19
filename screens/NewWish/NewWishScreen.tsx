@@ -1,10 +1,22 @@
+import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {SafeAreaView, Text} from 'react-native';
+import {SafeAreaView} from 'react-native';
+import {Appbar} from 'react-native-paper';
 
 const NewWishScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <SafeAreaView>
-      <Text>New wish screen</Text>
+      <Appbar.Header>
+        <Appbar.Action
+          icon="keyboard-backspace"
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+        <Appbar.Content title="New wish" />
+      </Appbar.Header>
     </SafeAreaView>
   );
 };
