@@ -1,6 +1,7 @@
 package org.thereyouwish.app
 
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import expo.modules.ReactActivityDelegateWrapper
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
@@ -10,6 +11,7 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 class MainActivity : ReactActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(null)
     }
 
