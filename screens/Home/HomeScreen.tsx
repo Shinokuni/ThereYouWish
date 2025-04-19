@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import {Appbar, FAB} from 'react-native-paper';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
+import {DrawerActions} from '@react-navigation/native';
 
 import {Collection, collection} from '../../db/schema';
 import * as schema from '../../db/schema';
@@ -42,6 +43,12 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <Appbar.Header>
+        <Appbar.Action
+          icon="menu"
+          onPress={() => {
+            navigation.openDrawer();
+          }}
+        />
         <Appbar.Content title="Wishes" />
       </Appbar.Header>
 
