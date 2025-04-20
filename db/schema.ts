@@ -5,6 +5,7 @@ export const collection = sqliteTable('collection', {
   id: integer().primaryKey({autoIncrement: true}),
   name: text().notNull(),
   description: text(),
+  current: integer({mode: 'boolean'}).notNull(),
 });
 
 export type Collection = typeof collection.$inferSelect;

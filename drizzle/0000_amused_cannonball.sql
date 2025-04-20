@@ -1,7 +1,8 @@
 CREATE TABLE `collection` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
-	`description` text
+	`description` text,
+	`current` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `entry` (

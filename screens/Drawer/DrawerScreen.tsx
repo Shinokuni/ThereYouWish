@@ -1,8 +1,12 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Drawer, Menu} from 'react-native-paper';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import Icon from '@react-native-vector-icons/material-design-icons';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
+import {useSQLiteContext} from 'expo-sqlite';
+import {drizzle} from 'drizzle-orm/expo-sqlite';
+import * as schema from '../../db/schema';
+import {Collection} from '../../db/schema';
 
 type DrawerCollectionMenuProps = {
   onRename: () => void;
@@ -46,6 +50,19 @@ const DrawerCollectionFunc = () => {
 
 const DrawerScreen = () => {
   const drawerContext = useDrawerContext();
+  const expo = useSQLiteContext();
+  const database = drizzle(expo, {schema});
+
+  const [collections, setCollections] = useState<Collection[]>([]);
+
+  useEffect(() => {
+    const loadCollections = async () => {
+      const loaded = await database.select().from(schema.collection);
+      setCollections(loaded);
+    };
+
+    loadCollections();
+  });
 
   return (
     <DrawerContentScrollView>
@@ -77,13 +94,22 @@ const DrawerScreen = () => {
       </Drawer.Section>
 
       <Drawer.Section title="Collections">
-        <Drawer.Item
-          label="Default collection"
-          icon={'image-multiple'}
-          active={true}
-          right={() => DrawerCollectionFunc()}
-          onPress={() => {}}
-        />
+        {collections.length > 0 &&
+          collections.map(value => (
+            <Drawer.Item
+              key={value.id}
+              label={value.name}
+              icon={'image-multiple'}
+              active={value.current}
+              right={() => DrawerCollectionFunc()}
+              onPress={() => {
+                drawerContext?.setState({
+                  ...drawerContext.drawerState,
+                  collectionId: value.id,
+                });
+              }}
+            />
+          ))}
       </Drawer.Section>
 
       <Drawer.Section title="Tags" showDivider={false}>
