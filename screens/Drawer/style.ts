@@ -1,10 +1,5 @@
 import {StyleSheet} from 'react-native';
 
-const style = StyleSheet.create({
-  separator: {
-    borderWidth: 0.25,
-    marginHorizontal: 16,
-  },
-});
+const style = StyleSheet.create({});
 
 export default style;

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Appbar, FAB} from 'react-native-paper';
+import {Appbar, FAB, useTheme} from 'react-native-paper';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
 import {DrawerActions} from '@react-navigation/native';
@@ -14,6 +14,7 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const expo = useSQLiteContext();
   const database = drizzle(expo, {schema});
+  const theme = useTheme();
 
   const [collections, setCollections] = useState<Collection[]>([]);
 
@@ -41,7 +42,7 @@ const HomeScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: theme.colors.background}}>
       <Appbar.Header>
         <Appbar.Action
           icon="menu"

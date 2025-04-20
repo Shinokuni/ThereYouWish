@@ -1,23 +1,84 @@
-import React from 'react';
-import {DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer';
-import {View} from 'react-native';
+import React, {useState} from 'react';
+import {Drawer, Menu} from 'react-native-paper';
+import {DrawerContentScrollView} from '@react-navigation/drawer';
+import Icon from '@react-native-vector-icons/material-design-icons';
 
-import style from './style';
-import { Text } from 'react-native-paper';
+type DrawerCollectionMenuProps = {
+  onRename: () => void;
+  onDelete: () => void;
+};
+
+const DrawerCollectionMenu = ({
+  onRename,
+  onDelete,
+}: DrawerCollectionMenuProps) => {
+  const [visible, setVisible] = useState(false);
+  const openMenu = () => setVisible(true);
+  const closeMenu = () => setVisible(false);
+
+  return (
+    <Menu
+      visible={visible}
+      onDismiss={closeMenu}
+      anchor={<Icon name={'dots-vertical'} size={24} onPress={openMenu} />}>
+      <Menu.Item
+        onPress={() => {
+          closeMenu();
+          onRename();
+        }}
+        title="Rename"
+      />
+      <Menu.Item
+        onPress={() => {
+          closeMenu();
+          onDelete();
+        }}
+        title="Delete"
+      />
+    </Menu>
+  );
+};
+
+const DrawerCollectionFunc = () => {
+  return <DrawerCollectionMenu onRename={() => {}} onDelete={() => {}} />;
+};
 
 const DrawerScreen = () => {
   return (
     <DrawerContentScrollView>
-      <DrawerItem label={'On going'} focused={true} onPress={() => {}} />
-      <DrawerItem label={'Done'} focused={false} onPress={() => {}} />
+      <Drawer.Section title="Status">
+        <Drawer.Item
+          label="On going"
+          icon={'refresh'}
+          active={true}
+          onPress={() => {}}
+        />
+        <Drawer.Item
+          label="Done"
+          icon={'check-all'}
+          active={false}
+          onPress={() => {}}
+        />
+      </Drawer.Section>
 
-      <View style={style.separator} />
+      <Drawer.Section title="Collections">
+        <Drawer.Item
+          label="Default collection"
+          icon={'image-multiple'}
+          active={true}
+          right={() => DrawerCollectionFunc()}
+          onPress={() => {}}
+        />
+      </Drawer.Section>
 
-      <Text>Collections</Text>
-
-      <View style={style.separator} />
-
-      <Text>Tags</Text>
+      <Drawer.Section title="Tags" showDivider={false}>
+        <Drawer.Item
+          label="Tag 1"
+          icon={'tag'}
+          active={true}
+          onPress={() => {}}
+        />
+      </Drawer.Section>
     </DrawerContentScrollView>
   );
 };
