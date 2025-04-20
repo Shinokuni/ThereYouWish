@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Drawer, Menu} from 'react-native-paper';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import Icon from '@react-native-vector-icons/material-design-icons';
+import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 
 type DrawerCollectionMenuProps = {
   onRename: () => void;
@@ -44,20 +45,34 @@ const DrawerCollectionFunc = () => {
 };
 
 const DrawerScreen = () => {
+  const drawerContext = useDrawerContext();
+
   return (
     <DrawerContentScrollView>
       <Drawer.Section title="Status">
         <Drawer.Item
           label="On going"
           icon={'refresh'}
-          active={true}
-          onPress={() => {}}
+          active={drawerContext?.drawerState.wishState === WishState.ongoing}
+          onPress={() => {
+            drawerContext?.setState({
+              ...drawerContext.drawerState,
+              wishState: WishState.ongoing,
+            });
+          }}
         />
         <Drawer.Item
           label="Done"
           icon={'check-all'}
-          active={false}
-          onPress={() => {}}
+          active={drawerContext?.drawerState.wishState === WishState.done}
+          onPress={() => {
+            if (drawerContext != null) {
+              drawerContext.setState({
+                ...drawerContext.drawerState,
+                wishState: WishState.done,
+              });
+            }
+          }}
         />
       </Drawer.Section>
 

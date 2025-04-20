@@ -4,6 +4,7 @@ import {openDatabaseSync, SQLiteProvider} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
 import {useMigrations} from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from './drizzle/migrations';
+import {DrawerContextProvider} from './contexts/DrawerContext';
 
 function App(): React.JSX.Element {
   const expo = openDatabaseSync('thereyouwish.db');
@@ -12,9 +13,11 @@ function App(): React.JSX.Element {
   const {success, error} = useMigrations(db, migrations);
 
   return (
-    <SQLiteProvider databaseName={'thereyouwish.db'}>
-      <Navigation />
-    </SQLiteProvider>
+    <DrawerContextProvider>
+      <SQLiteProvider databaseName={'thereyouwish.db'}>
+        <Navigation />
+      </SQLiteProvider>
+    </DrawerContextProvider>
   );
 }
 
