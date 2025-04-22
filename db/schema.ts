@@ -1,5 +1,6 @@
 import {sql} from 'drizzle-orm';
 import {sqliteTable, integer, text, real} from 'drizzle-orm/sqlite-core';
+import { WishState } from '../contexts/DrawerContext';
 
 export const collection = sqliteTable('collection', {
   id: integer().primaryKey({autoIncrement: true}),
@@ -27,7 +28,7 @@ export const entry = sqliteTable('entry', {
   name: text().notNull(),
   description: text(),
   price: real(),
-  state: text().notNull(),
+  state: text().notNull().$type<WishState>(),
   dueDate: text('due_date'),
   startDate: text('start_date')
     .notNull()

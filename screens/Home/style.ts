@@ -7,6 +7,9 @@ const style = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  list: {
+    margin: 8,
+  },
 });
 
 export default style;
