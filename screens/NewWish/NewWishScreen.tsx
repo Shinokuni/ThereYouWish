@@ -18,6 +18,7 @@ import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import {entry, wish} from '../../db/schema';
 import style from './style';
 import useGlobalStyle from '../../components/globalStyle';
+import {getCurrencies} from 'react-native-localize';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
@@ -28,10 +29,13 @@ const NewWishScreen = () => {
   const expo = useSQLiteContext();
   const database = drizzle(expo);
 
+  const [currency] = getCurrencies();
+
   const [title, setTitle] = useState('');
   const [isTitleError, setTitleError] = useState(false);
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [dueDate, setDueDate] = useState('');
 
   const checkFields = () => {
     if (title.length > 0) {
@@ -114,7 +118,9 @@ const NewWishScreen = () => {
 
         <View style={style.priceDateContainer}>
           <View style={style.priceContainer}>
-            <Text variant={'labelLarge'} style={style.label}>Price</Text>
+            <Text variant={'labelLarge'} style={style.label}>
+              Price
+            </Text>
             <TextInput
               value={price}
               onChangeText={setPrice}
@@ -125,14 +131,17 @@ const NewWishScreen = () => {
               underlineColor="transparent"
               activeUnderlineColor="transparent"
               cursorColor={theme.colors.primary}
+              left={<TextInput.Icon icon={`currency-${currency.toLowerCase()}`} />}
             />
           </View>
 
           <View style={style.dateContainer}>
-            <Text variant={'labelLarge'} style={style.label}>Due date</Text>
+            <Text variant={'labelLarge'} style={style.label}>
+              Due date
+            </Text>
             <TextInput
-              value={price}
-              onChangeText={setPrice}
+              value={dueDate}
+              //onChangeText={setPrice}
               placeholder={'Enter a due date'}
               keyboardType="numeric"
               numberOfLines={1}
