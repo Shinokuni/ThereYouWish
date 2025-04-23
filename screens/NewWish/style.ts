@@ -27,6 +27,9 @@ const style = StyleSheet.create({
   dateContainer: {
     flex: 1,
   },
+  priceDateInput: {
+    paddingStart: 0,
+  },
   tagSurface: {
     flexDirection: 'row',
     padding: 8,

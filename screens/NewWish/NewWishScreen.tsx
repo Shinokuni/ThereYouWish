@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {SafeAreaView, ScrollView, View} from 'react-native';
+import {Pressable, SafeAreaView, ScrollView, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {
   Appbar,
@@ -18,7 +18,8 @@ import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import {entry, wish} from '../../db/schema';
 import style from './style';
 import useGlobalStyle from '../../components/globalStyle';
-import {getCurrencies} from 'react-native-localize';
+import {getCurrencies, getLocales} from 'react-native-localize';
+import DatePicker from 'react-native-date-picker';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
@@ -30,12 +31,14 @@ const NewWishScreen = () => {
   const database = drizzle(expo);
 
   const [currency] = getCurrencies();
+  const [locale] = getLocales();
 
   const [title, setTitle] = useState('');
   const [isTitleError, setTitleError] = useState(false);
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [dueDate, setDueDate] = useState('');
+  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [isDatePickerOpen, setDatePickerOpen] = useState(false);
 
   const checkFields = () => {
     if (title.length > 0) {
@@ -131,7 +134,10 @@ const NewWishScreen = () => {
               underlineColor="transparent"
               activeUnderlineColor="transparent"
               cursorColor={theme.colors.primary}
-              left={<TextInput.Icon icon={`currency-${currency.toLowerCase()}`} />}
+              contentStyle={style.priceDateInput}
+              left={
+                <TextInput.Icon icon={`currency-${currency.toLowerCase()}`} />
+              }
             />
           </View>
 
@@ -139,16 +145,45 @@ const NewWishScreen = () => {
             <Text variant={'labelLarge'} style={style.label}>
               Due date
             </Text>
-            <TextInput
-              value={dueDate}
-              //onChangeText={setPrice}
-              placeholder={'Enter a due date'}
-              keyboardType="numeric"
-              numberOfLines={1}
-              style={style.baseInput}
-              underlineColor="transparent"
-              activeUnderlineColor="transparent"
-              cursorColor={theme.colors.primary}
+            <Pressable
+              onPress={() => {
+                setDatePickerOpen(true);
+              }}>
+              <TextInput
+                value={dueDate?.toLocaleDateString(locale.languageCode)}
+                editable={false}
+                placeholder={'due date'}
+                keyboardType="numeric"
+                numberOfLines={1}
+                style={style.baseInput}
+                underlineColor="transparent"
+                activeUnderlineColor="transparent"
+                cursorColor={theme.colors.primary}
+                contentStyle={style.priceDateInput}
+                left={
+                  <TextInput.Icon
+                    icon={'calendar-edit'}
+                    onPress={() => {
+                      setDatePickerOpen(true);
+                    }}
+                  />
+                }
+              />
+            </Pressable>
+
+            <DatePicker
+              modal
+              mode="date"
+              locale={locale.languageCode}
+              open={isDatePickerOpen}
+              date={new Date()}
+              onConfirm={date => {
+                setDatePickerOpen(false);
+                setDueDate(date);
+              }}
+              onCancel={() => {
+                setDatePickerOpen(false);
+              }}
             />
           </View>
         </View>
