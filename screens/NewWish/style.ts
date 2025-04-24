@@ -32,8 +32,23 @@ const style = StyleSheet.create({
   },
   tagSurface: {
     flexDirection: 'row',
+    alignItems: 'center',
     padding: 8,
     borderRadius: 8,
+  },
+  tagMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tagList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+  },
+  tag: {
+    marginEnd: 4,
+    marginBottom: 8,
   },
   validate: {
     bottom: 32,

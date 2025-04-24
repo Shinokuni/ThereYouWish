@@ -1,6 +1,6 @@
 import {sql} from 'drizzle-orm';
 import {sqliteTable, integer, text, real} from 'drizzle-orm/sqlite-core';
-import { WishState } from '../contexts/DrawerContext';
+import {WishState} from '../contexts/DrawerContext';
 
 export const collection = sqliteTable('collection', {
   id: integer().primaryKey({autoIncrement: true}),
@@ -81,3 +81,5 @@ export const tagJoin = sqliteTable('tag_join', {
     .references(() => tag.id)
     .notNull(),
 });
+
+export type TagJoin = typeof tagJoin.$inferSelect;

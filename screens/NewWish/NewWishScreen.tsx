@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Pressable, SafeAreaView, ScrollView, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {
   Appbar,
   Button,
+  Chip,
   HelperText,
   IconButton,
   Surface,
@@ -15,11 +16,13 @@ import {drizzle} from 'drizzle-orm/expo-sqlite';
 import {useSQLiteContext} from 'expo-sqlite';
 
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
-import {entry, wish} from '../../db/schema';
+import {entry, Tag, tag, tagJoin, wish} from '../../db/schema';
 import style from './style';
 import useGlobalStyle from '../../components/globalStyle';
 import {getCurrencies, getLocales} from 'react-native-localize';
 import DatePicker from 'react-native-date-picker';
+import TagBottomSheet from '../../components/TagBottomSheet/TagBottomSheet';
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
@@ -40,6 +43,25 @@ const NewWishScreen = () => {
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
 
+  const [tags, setTags] = useState<Tag[]>([]);
+  let [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+
+  const bottomSheetRef = useRef<BottomSheetModal | null>(null);
+
+  const loadTags = async () => {
+    const newTags = await database.select().from(tag);
+    setTags(newTags);
+  };
+
+  useEffect(() => {
+    loadTags();
+  });
+
+  const addNewTag = async (name: string) => {
+    await database.insert(tag).values({name: name});
+    loadTags();
+  };
+
   const checkFields = () => {
     if (title.length > 0) {
       return true;
@@ -58,13 +80,22 @@ const NewWishScreen = () => {
       })
       .returning({id: wish.id});
 
-    await database.insert(entry).values({
-      name: title,
-      description: description,
-      price: parseFloat(price),
-      state: WishState.ongoing,
-      wishId: newWish.id,
-    });
+    const [newEntry] = await database
+      .insert(entry)
+      .values({
+        name: title,
+        description: description,
+        price: parseFloat(price),
+        state: WishState.ongoing,
+        wishId: newWish.id,
+      })
+      .returning({id: entry.id});
+
+    await database
+      .insert(tagJoin)
+      .values(
+        selectedTagIds.map(value => ({entryId: newEntry.id, tagId: value})),
+      );
 
     navigation.goBack();
   };
@@ -188,16 +219,31 @@ const NewWishScreen = () => {
           </View>
         </View>
 
-        <Surface style={style.tagSurface} mode="flat">
-          <IconButton
-            mode={'contained-tonal'}
-            icon={'tag-plus'}
-            size={24}
-            onPress={() => {}}
-          />
-        </Surface>
+        <Pressable
+          onPress={() => {
+            bottomSheetRef.current?.present();
+          }}>
+          <Surface style={style.tagSurface} mode="flat">
+            <IconButton mode={'contained-tonal'} icon={'tag'} size={24} />
+
+            {selectedTagIds.length === 0 ? (
+              <View style={style.tagMessage}>
+                <Text >Add tag</Text>
+              </View>
+            ) : (
+              <View style={style.tagList}>
+                {selectedTagIds.map(id => {
+                  const selectedTag = tags.find(value => value.id === id)!!;
+
+                  return <Chip style={style.tag}>{selectedTag.name}</Chip>;
+                })}
+              </View>
+            )}
+          </Surface>
+        </Pressable>
 
         <IconButton icon={'image-plus'} size={24} onPress={() => {}} />
+        <IconButton icon={'link-plus'} size={24} onPress={() => {}} />
       </ScrollView>
       <Button
         mode="contained"
@@ -209,6 +255,25 @@ const NewWishScreen = () => {
         }}>
         Validate
       </Button>
+
+      <TagBottomSheet
+        tags={tags}
+        ref={bottomSheetRef}
+        onAddTag={async tagName => {
+          addNewTag(tagName);
+        }}
+        selectedTagids={selectedTagIds}
+        onSelectTag={({id}) => {
+          if (selectedTagIds.includes(id)) {
+            const index = selectedTagIds.indexOf(id);
+            selectedTagIds.splice(index, 1);
+          } else {
+            selectedTagIds.push(id);
+          }
+
+          setSelectedTagIds(selectedTagIds);
+        }}
+      />
     </SafeAreaView>
   );
 };

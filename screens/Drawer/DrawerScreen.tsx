@@ -6,7 +6,7 @@ import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
 import * as schema from '../../db/schema';
-import {Collection} from '../../db/schema';
+import {Collection, Tag} from '../../db/schema';
 
 type DrawerCollectionMenuProps = {
   onRename: () => void;
@@ -54,14 +54,18 @@ const DrawerScreen = () => {
   const database = drizzle(expo, {schema});
 
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
 
   useEffect(() => {
-    const loadCollections = async () => {
+    const loadData = async () => {
       const loaded = await database.select().from(schema.collection);
       setCollections(loaded);
+
+      const loadedTags = await database.select().from(schema.tag);
+      setTags(loadedTags);
     };
 
-    loadCollections();
+    loadData();
   });
 
   return (
@@ -95,17 +99,17 @@ const DrawerScreen = () => {
 
       <Drawer.Section title="Collections">
         {collections.length > 0 &&
-          collections.map(value => (
+          collections.map(collection => (
             <Drawer.Item
-              key={value.id}
-              label={value.name}
+              key={collection.id}
+              label={collection.name}
               icon={'image-multiple'}
-              active={value.current}
+              active={collection.current}
               right={() => DrawerCollectionFunc()}
               onPress={() => {
                 drawerContext?.setState({
                   ...drawerContext.drawerState,
-                  collectionId: value.id,
+                  collectionId: collection.id,
                 });
               }}
             />
@@ -113,12 +117,22 @@ const DrawerScreen = () => {
       </Drawer.Section>
 
       <Drawer.Section title="Tags" showDivider={false}>
-        <Drawer.Item
-          label="Tag 1"
-          icon={'tag'}
-          active={true}
-          onPress={() => {}}
-        />
+        {tags.length > 0 &&
+          tags.map(tag => (
+            <Drawer.Item
+              key={tag.id}
+              label={tag.name}
+              icon={'tag'}
+              active={tag.id === drawerContext?.drawerState.tagId}
+              onPress={() => {
+                drawerContext?.setState({
+                  ...drawerContext.drawerState,
+                  tagId: tag.id,
+                });
+              }}
+              right={() => DrawerCollectionFunc()}
+            />
+          ))}
       </Drawer.Section>
     </DrawerContentScrollView>
   );

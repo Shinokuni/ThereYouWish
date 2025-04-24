@@ -26,7 +26,7 @@ const HomeScreen = () => {
     };
 
     loadWishes();
-  }, [database]);
+  });
 
   return (
     <SafeAreaView style={globalStyle.screenContainer}>
