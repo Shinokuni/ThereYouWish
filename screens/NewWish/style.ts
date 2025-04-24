@@ -30,11 +30,29 @@ const style = StyleSheet.create({
   priceDateInput: {
     paddingStart: 0,
   },
+  linkSurface: {
+    marginBottom: 16,
+    borderRadius: 8,
+  },
+  linkItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingStart: 8,
+  },
+  hostContainer: {
+    flexDirection: 'row',
+  },
+  host: {
+    marginStart: 8,
+    textDecorationLine: 'underline',
+  },
   tagSurface: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 8,
     borderRadius: 8,
+    marginBottom: 8,
   },
   tagMessage: {
     flexDirection: 'row',

@@ -1,51 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Drawer, Menu} from 'react-native-paper';
+import {Drawer} from 'react-native-paper';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
-import Icon from '@react-native-vector-icons/material-design-icons';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
 import * as schema from '../../db/schema';
 import {Collection, Tag} from '../../db/schema';
+import DropdownMenu, {Action} from '../../components/DropdownMenu/DropdownMenu';
 
-type DrawerCollectionMenuProps = {
-  onRename: () => void;
-  onDelete: () => void;
-};
-
-const DrawerCollectionMenu = ({
-  onRename,
-  onDelete,
-}: DrawerCollectionMenuProps) => {
-  const [visible, setVisible] = useState(false);
-  const openMenu = () => setVisible(true);
-  const closeMenu = () => setVisible(false);
-
-  return (
-    <Menu
-      visible={visible}
-      onDismiss={closeMenu}
-      anchor={<Icon name={'dots-vertical'} size={24} onPress={openMenu} />}>
-      <Menu.Item
-        onPress={() => {
-          closeMenu();
-          onRename();
-        }}
-        title="Rename"
-      />
-      <Menu.Item
-        onPress={() => {
-          closeMenu();
-          onDelete();
-        }}
-        title="Delete"
-      />
-    </Menu>
-  );
-};
-
-const DrawerCollectionFunc = () => {
-  return <DrawerCollectionMenu onRename={() => {}} onDelete={() => {}} />;
+const DrawerMenu = (actions: Action[]) => {
+  return <DropdownMenu actions={actions} />;
 };
 
 const DrawerScreen = () => {
@@ -105,7 +69,18 @@ const DrawerScreen = () => {
               label={collection.name}
               icon={'image-multiple'}
               active={collection.current}
-              right={() => DrawerCollectionFunc()}
+              right={() =>
+                DrawerMenu([
+                  {
+                    name: 'Rename',
+                    onClick: () => {},
+                  },
+                  {
+                    name: 'Delete',
+                    onClick: () => {},
+                  },
+                ])
+              }
               onPress={() => {
                 drawerContext?.setState({
                   ...drawerContext.drawerState,
@@ -130,7 +105,18 @@ const DrawerScreen = () => {
                   tagId: tag.id,
                 });
               }}
-              right={() => DrawerCollectionFunc()}
+              right={() =>
+                DrawerMenu([
+                  {
+                    name: 'Rename',
+                    onClick: () => {},
+                  },
+                  {
+                    name: 'Delete',
+                    onClick: () => {},
+                  },
+                ])
+              }
             />
           ))}
       </Drawer.Section>

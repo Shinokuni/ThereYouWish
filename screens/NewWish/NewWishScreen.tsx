@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Pressable, SafeAreaView, ScrollView, View} from 'react-native';
+import {Linking, Pressable, SafeAreaView, ScrollView, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {
   Appbar,
@@ -16,13 +16,14 @@ import {drizzle} from 'drizzle-orm/expo-sqlite';
 import {useSQLiteContext} from 'expo-sqlite';
 
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
-import {entry, Tag, tag, tagJoin, wish} from '../../db/schema';
+import {entry, link, Tag, tag, tagJoin, wish} from '../../db/schema';
 import style from './style';
 import useGlobalStyle from '../../components/globalStyle';
 import {getCurrencies, getLocales} from 'react-native-localize';
 import DatePicker from 'react-native-date-picker';
 import TagBottomSheet from '../../components/TagBottomSheet/TagBottomSheet';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
+import Icon from '@react-native-vector-icons/material-design-icons';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
@@ -42,6 +43,10 @@ const NewWishScreen = () => {
   const [price, setPrice] = useState('');
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
+
+  let [links, setLinks] = useState<URL[]>([]);
+  const [linkValue, setLinkValue] = useState('');
+  const [isLinkError, setIsLinkError] = useState(false);
 
   const [tags, setTags] = useState<Tag[]>([]);
   let [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
@@ -97,6 +102,12 @@ const NewWishScreen = () => {
         selectedTagIds.map(value => ({entryId: newEntry.id, tagId: value})),
       );
 
+    await database
+      .insert(link)
+      .values(
+        links.map(newLink => ({url: newLink.toString(), entryId: newEntry.id})),
+      );
+
     navigation.goBack();
   };
 
@@ -112,7 +123,10 @@ const NewWishScreen = () => {
         <Appbar.Content title="New wish" />
       </Appbar.Header>
 
-      <ScrollView style={globalStyle.screenSpacing}>
+      <ScrollView
+        style={globalStyle.screenSpacing}
+        showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets={true}>
         <Text variant={'labelLarge'} style={style.label}>
           Title*
         </Text>
@@ -219,6 +233,79 @@ const NewWishScreen = () => {
           </View>
         </View>
 
+        <Text variant={'labelLarge'} style={style.label}>
+          Links
+        </Text>
+        <Surface style={style.linkSurface}>
+          <View>
+            <TextInput
+              value={linkValue}
+              onChangeText={value => {
+                setLinkValue(value);
+                setIsLinkError(false);
+              }}
+              placeholder={'Add link...'}
+              underlineColor="transparent"
+              activeUnderlineColor="transparent"
+              cursorColor={theme.colors.primary}
+              style={style.baseInput}
+              left={<TextInput.Icon icon="link-plus" />}
+              right={
+                <TextInput.Icon
+                  icon="plus"
+                  onPress={() => {
+                    if (linkValue.length > 0) {
+                      try {
+                        links.push(new URL(linkValue));
+                        setLinks(links);
+                        setLinkValue('');
+                      } catch (e) {
+                        setIsLinkError(true);
+                      }
+                    }
+                  }}
+                />
+              }
+            />
+
+            {isLinkError && (
+              <HelperText type={'error'} visible={isLinkError}>
+                Entered value is not a valid URL
+              </HelperText>
+            )}
+          </View>
+
+          {links.length > 0 &&
+            links.map(link => {
+              return (
+                <View key={link.toString()} style={style.linkItem}>
+                  <View style={style.hostContainer}>
+                    <Icon name="link" size={24} />
+                    <Text
+                      variant={'titleMedium'}
+                      style={{...style.host, color: theme.colors.primary}}
+                      onPress={() => {
+                        Linking.openURL(link.toString());
+                      }}>
+                      {link.host}
+                    </Text>
+                  </View>
+                  <IconButton
+                    icon={'delete'}
+                    size={24}
+                    onPress={() => {
+                      links.splice(links.indexOf(link), 1);
+                      setLinks(links);
+                    }}
+                  />
+                </View>
+              );
+            })}
+        </Surface>
+
+        <Text variant={'labelLarge'} style={style.label}>
+          Tags
+        </Text>
         <Pressable
           onPress={() => {
             bottomSheetRef.current?.present();
@@ -228,22 +315,28 @@ const NewWishScreen = () => {
 
             {selectedTagIds.length === 0 ? (
               <View style={style.tagMessage}>
-                <Text >Add tag</Text>
+                <Text>Add tag</Text>
               </View>
             ) : (
               <View style={style.tagList}>
                 {selectedTagIds.map(id => {
                   const selectedTag = tags.find(value => value.id === id)!!;
 
-                  return <Chip style={style.tag}>{selectedTag.name}</Chip>;
+                  return (
+                    <Chip key={id} style={style.tag}>
+                      {selectedTag.name}
+                    </Chip>
+                  );
                 })}
               </View>
             )}
           </Surface>
         </Pressable>
 
+        <Text variant={'labelLarge'} style={style.label}>
+          Images
+        </Text>
         <IconButton icon={'image-plus'} size={24} onPress={() => {}} />
-        <IconButton icon={'link-plus'} size={24} onPress={() => {}} />
       </ScrollView>
       <Button
         mode="contained"

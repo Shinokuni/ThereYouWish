@@ -1,10 +1,11 @@
 import React from 'react';
 
-import {Entry, Tag} from '../../db/schema';
-import {Card, Chip, Text} from 'react-native-paper';
+import {Entry, Link, Tag} from '../../db/schema';
+import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
 import style from './style';
-import {View} from 'react-native';
+import {Linking, View} from 'react-native';
 import {getCurrencies, getLocales} from 'react-native-localize';
+import DropdownMenu from '../DropdownMenu/DropdownMenu';
 
 const formatPrice = (price: number) => {
   const [locale] = getLocales();
@@ -24,22 +25,34 @@ type WishItemProps = {
 export interface FullEntry {
   entry: Entry;
   tags: Tag[];
+  links: Link[];
 }
 
 const WishItem = ({fullEntry}: WishItemProps) => {
   const entry = fullEntry.entry;
   const tags = fullEntry.tags;
+  const links = fullEntry.links;
+
+  const theme = useTheme();
 
   return (
-    <Card style={style.container}>
+    <Card style={{...style.container, paddingBottom: 0}}>
       <View style={style.header}>
         <Text variant={'headlineSmall'} numberOfLines={1} style={style.name}>
           {entry.name}
         </Text>
         {entry.price !== null && (
-          <Text variant={'bodyLarge'} style={style.price}>
-            {formatPrice(entry.price)}
-          </Text>
+          <View
+            style={{
+              ...style.priceContainer,
+              backgroundColor: theme.colors.primaryContainer,
+            }}>
+            <Text
+              variant={'bodyLarge'}
+              style={{color: theme.colors.onPrimaryContainer}}>
+              {formatPrice(entry.price)}
+            </Text>
+          </View>
         )}
       </View>
       {entry.description !== null && (
@@ -57,6 +70,40 @@ const WishItem = ({fullEntry}: WishItemProps) => {
               </Chip>
             );
           })}
+      </View>
+
+      <View style={style.iconContainer}>
+        {links.length > 0 &&
+          (links.length === 1 ? (
+            <IconButton
+              icon={'open-in-new'}
+              onPress={() => {
+                Linking.openURL(links[0].url);
+              }}
+            />
+          ) : (
+            <DropdownMenu
+              actions={links.map(value => ({
+                name: new URL(value.url).host,
+                onClick: () => {
+                  Linking.openURL(value.url);
+                },
+              }))}
+              icon={'open-in-new'}
+            />
+          ))}
+        <DropdownMenu
+          actions={[
+            {
+              name: 'Edit',
+              onClick: () => {},
+            },
+            {
+              name: 'Delete',
+              onClick: () => {},
+            },
+          ]}
+        />
       </View>
     </Card>
   );

@@ -16,8 +16,10 @@ const useStyle = StyleSheet.create({
   name: {
     flex: 1,
   },
-  price: {
-    marginStart: 8,
+  priceContainer: {
+    padding: 4,
+    borderRadius: 8,
+    paddingHorizontal: 8,
   },
   tagContainer: {
     flexDirection: 'row',
@@ -26,6 +28,11 @@ const useStyle = StyleSheet.create({
   tag: {
     marginEnd: 8,
     marginBottom: 8,
+  },
+  iconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
 });
 

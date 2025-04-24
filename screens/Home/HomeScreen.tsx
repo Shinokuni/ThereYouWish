@@ -9,7 +9,7 @@ import style from './style';
 import WishItem, {FullEntry} from '../../components/WishItem/WishItem';
 import useGlobalStyle from '../../components/globalStyle';
 import {eq} from 'drizzle-orm';
-import {entry, tag, tagJoin} from '../../db/schema';
+import {entry, link, tag, tagJoin} from '../../db/schema';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -32,7 +32,12 @@ const HomeScreen = () => {
           .innerJoin(tagJoin, eq(tag.id, tagJoin.tagId))
           .where(eq(tagJoin.entryId, dbEntry.id));
 
-        fullEntries.push({entry: dbEntry, tags: tags});
+        const links = await database
+          .select()
+          .from(link)
+          .where(eq(link.entryId, dbEntry.id));
+
+        fullEntries.push({entry: dbEntry, tags: tags, links: links});
       }
 
       setEntries(fullEntries);
