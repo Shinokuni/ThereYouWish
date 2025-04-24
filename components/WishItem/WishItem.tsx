@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {Entry} from '../../db/schema';
-import {Card, Text} from 'react-native-paper';
+import {Entry, Tag} from '../../db/schema';
+import {Card, Chip, Text} from 'react-native-paper';
 import style from './style';
 import {View} from 'react-native';
 import {getCurrencies, getLocales} from 'react-native-localize';
@@ -18,10 +18,18 @@ const formatPrice = (price: number) => {
 };
 
 type WishItemProps = {
-  entry: Entry;
+  fullEntry: FullEntry;
 };
 
-const WishItem = ({entry}: WishItemProps) => {
+export interface FullEntry {
+  entry: Entry;
+  tags: Tag[];
+}
+
+const WishItem = ({fullEntry}: WishItemProps) => {
+  const entry = fullEntry.entry;
+  const tags = fullEntry.tags;
+
   return (
     <Card style={style.container}>
       <View style={style.header}>
@@ -39,6 +47,17 @@ const WishItem = ({entry}: WishItemProps) => {
           {entry.description}
         </Text>
       )}
+
+      <View style={style.tagContainer}>
+        {tags.length > 0 &&
+          tags.map(tag => {
+            return (
+              <Chip key={tag.id} style={style.tag}>
+                {tag.name}
+              </Chip>
+            );
+          })}
+      </View>
     </Card>
   );
 };

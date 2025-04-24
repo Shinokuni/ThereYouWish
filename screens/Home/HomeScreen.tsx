@@ -5,24 +5,37 @@ import {Appbar, FAB} from 'react-native-paper';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
 
-import * as schema from '../../db/schema';
 import style from './style';
-import WishItem from '../../components/WishItem/WishItem';
+import WishItem, {FullEntry} from '../../components/WishItem/WishItem';
 import useGlobalStyle from '../../components/globalStyle';
+import {eq} from 'drizzle-orm';
+import {entry, tag, tagJoin} from '../../db/schema';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const expo = useSQLiteContext();
-  const database = drizzle(expo, {schema});
+  const database = drizzle(expo);
   const globalStyle = useGlobalStyle();
 
-  const [entries, setEntries] = useState<schema.Entry[]>([]);
+  const [entries, setEntries] = useState<FullEntry[]>([]);
 
   useEffect(() => {
     const loadWishes = async () => {
-      const dbEntries = await database.select().from(schema.entry);
+      const dbEntries = await database.select().from(entry);
 
-      setEntries(dbEntries);
+      const fullEntries: FullEntry[] = [];
+
+      for (const dbEntry of dbEntries) {
+        const tags = await database
+          .select({id: tag.id, name: tag.name})
+          .from(tag)
+          .innerJoin(tagJoin, eq(tag.id, tagJoin.tagId))
+          .where(eq(tagJoin.entryId, dbEntry.id));
+
+        fullEntries.push({entry: dbEntry, tags: tags});
+      }
+
+      setEntries(fullEntries);
     };
 
     loadWishes();
@@ -43,8 +56,8 @@ const HomeScreen = () => {
       <View style={style.list}>
         <FlatList
           data={entries}
-          renderItem={({item}) => <WishItem entry={item} />}
-          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => <WishItem fullEntry={item} />}
+          keyExtractor={item => item.entry.id.toString()}
         />
       </View>
 

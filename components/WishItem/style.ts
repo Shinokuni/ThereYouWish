@@ -19,6 +19,14 @@ const useStyle = StyleSheet.create({
   price: {
     marginStart: 8,
   },
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  tag: {
+    marginEnd: 8,
+    marginBottom: 8,
+  },
 });
 
 export default useStyle;
