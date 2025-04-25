@@ -1,4 +1,3 @@
-import Icon from '@react-native-vector-icons/material-design-icons';
 import React, {useState} from 'react';
 import {IconButton, Menu} from 'react-native-paper';
 
@@ -26,12 +25,13 @@ const DropdownMenu = ({
     <Menu
       visible={visible}
       onDismiss={closeMenu}
-      anchor={<IconButton icon={icon} size={24} onPress={openMenu} />}>
+      anchor={
+        <IconButton icon={icon} size={24} onPress={openMenu} style={style} />
+      }>
       {actions.map(action => {
         return (
           <Menu.Item
             key={action.name}
-            style={style}
             onPress={() => {
               closeMenu();
               action.onClick();

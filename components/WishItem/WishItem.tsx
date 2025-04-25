@@ -59,7 +59,7 @@ const WishItem = ({fullEntry}: WishItemProps) => {
         )}
       </View>
       {entry.description !== null && (
-        <Text variant={'bodyMedium'} numberOfLines={3}>
+        <Text variant={'bodyLarge'} style={style.description}>
           {entry.description}
         </Text>
       )}
@@ -77,6 +77,7 @@ const WishItem = ({fullEntry}: WishItemProps) => {
 
       {images.length > 0 && (
         <FlatList
+          style={style.imageList}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           keyExtractor={newImage => newImage.id.toString()}
@@ -99,6 +100,7 @@ const WishItem = ({fullEntry}: WishItemProps) => {
           (links.length === 1 ? (
             <IconButton
               icon={'open-in-new'}
+              style={style.link}
               onPress={() => {
                 Linking.openURL(links[0].url);
               }}
@@ -112,6 +114,7 @@ const WishItem = ({fullEntry}: WishItemProps) => {
                 },
               }))}
               icon={'open-in-new'}
+              style={style.link}
             />
           ))}
         <DropdownMenu
@@ -125,6 +128,7 @@ const WishItem = ({fullEntry}: WishItemProps) => {
               onClick: () => {},
             },
           ]}
+          style={style.actions}
         />
       </View>
     </Card>
