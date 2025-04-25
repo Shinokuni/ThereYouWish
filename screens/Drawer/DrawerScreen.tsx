@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Drawer} from 'react-native-paper';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
+
 import * as schema from '../../db/schema';
 import {Collection, Tag} from '../../db/schema';
 import DropdownMenu, {Action} from '../../components/DropdownMenu/DropdownMenu';
@@ -15,7 +16,7 @@ const DrawerMenu = (actions: Action[]) => {
 const DrawerScreen = () => {
   const drawerContext = useDrawerContext();
   const expo = useSQLiteContext();
-  const database = drizzle(expo, {schema});
+  const database = useMemo(() => drizzle(expo, {schema}), [expo]);
 
   const [collections, setCollections] = useState<Collection[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -30,7 +31,7 @@ const DrawerScreen = () => {
     };
 
     loadData();
-  });
+  }, [database, setCollections, setTags]);
 
   return (
     <DrawerContentScrollView>
