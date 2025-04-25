@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   FlatList,
   Linking,
@@ -41,10 +41,10 @@ const NewWishScreen = () => {
   const globalStyle = useGlobalStyle();
 
   const expo = useSQLiteContext();
-  const database = drizzle(expo);
+  const database = useMemo(() => drizzle(expo), [expo]);
 
-  const [currency] = getCurrencies();
-  const [locale] = getLocales();
+  const [currency] = useMemo(() => getCurrencies(), []);
+  const [locale] = useMemo(() => getLocales(), []);
 
   const [title, setTitle] = useState('');
   const [isTitleError, setTitleError] = useState(false);
@@ -64,14 +64,14 @@ const NewWishScreen = () => {
 
   const bottomSheetRef = useRef<BottomSheetModal | null>(null);
 
-  const loadTags = async () => {
+  const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
     setTags(newTags);
-  };
+  }, [database, setTags]);
 
   useEffect(() => {
     loadTags();
-  });
+  }, [loadTags]);
 
   const addNewTag = async (name: string) => {
     await database.insert(tag).values({name: name});
