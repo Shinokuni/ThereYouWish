@@ -380,11 +380,13 @@ const NewWishScreen = () => {
 
                 images = images.concat(
                   copyResults
-                    .map(value => value.sourceUri)
-                    .filter(value => !images.some(newImage => value === newImage)),
+                    .filter(value => value.status === 'success')
+                    .map(value => value.localUri)
+                    .filter(
+                      value => !images.some(newImage => value === newImage),
+                    ),
                 );
 
-                console.log(images);
                 setImages(images);
                 console.log();
               } catch (err: unknown) {

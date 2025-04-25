@@ -1,11 +1,12 @@
 import React from 'react';
 
-import {Entry, Link, Tag} from '../../db/schema';
+import {Entry, Image, Link, Tag} from '../../db/schema';
 import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
 import style from './style';
-import {Linking, View} from 'react-native';
+import {FlatList, Linking, View} from 'react-native';
 import {getCurrencies, getLocales} from 'react-native-localize';
 import DropdownMenu from '../DropdownMenu/DropdownMenu';
+import FixedHeightImage from '../FixedHeightImage/FixedHeightImage';
 
 const formatPrice = (price: number) => {
   const [locale] = getLocales();
@@ -26,17 +27,19 @@ export interface FullEntry {
   entry: Entry;
   tags: Tag[];
   links: Link[];
+  images: Image[];
 }
 
 const WishItem = ({fullEntry}: WishItemProps) => {
   const entry = fullEntry.entry;
   const tags = fullEntry.tags;
   const links = fullEntry.links;
+  const images = fullEntry.images;
 
   const theme = useTheme();
 
   return (
-    <Card style={{...style.container, paddingBottom: 0}}>
+    <Card style={{...style.container}}>
       <View style={style.header}>
         <Text variant={'headlineSmall'} numberOfLines={1} style={style.name}>
           {entry.name}
@@ -71,6 +74,25 @@ const WishItem = ({fullEntry}: WishItemProps) => {
             );
           })}
       </View>
+
+      {images.length > 0 && (
+        <FlatList
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={newImage => newImage.id.toString()}
+          data={images}
+          renderItem={({item}) => {
+            return (
+              <FixedHeightImage
+                fixedHeight={150}
+                key={item.id}
+                source={{uri: item.url}}
+                style={style.image}
+              />
+            );
+          }}
+        />
+      )}
 
       <View style={style.iconContainer}>
         {links.length > 0 &&

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {FlatList, SafeAreaView, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {Appbar, FAB} from 'react-native-paper';
@@ -9,12 +9,12 @@ import style from './style';
 import WishItem, {FullEntry} from '../../components/WishItem/WishItem';
 import useGlobalStyle from '../../components/globalStyle';
 import {eq} from 'drizzle-orm';
-import {entry, link, tag, tagJoin} from '../../db/schema';
+import {entry, image, link, tag, tagJoin} from '../../db/schema';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const expo = useSQLiteContext();
-  const database = drizzle(expo);
+  const database = useMemo(() => drizzle(expo), [expo]);
   const globalStyle = useGlobalStyle();
 
   const [entries, setEntries] = useState<FullEntry[]>([]);
@@ -37,14 +37,24 @@ const HomeScreen = () => {
           .from(link)
           .where(eq(link.entryId, dbEntry.id));
 
-        fullEntries.push({entry: dbEntry, tags: tags, links: links});
+        const images = await database
+          .select()
+          .from(image)
+          .where(eq(image.entryId, dbEntry.id));
+
+        fullEntries.push({
+          entry: dbEntry,
+          tags: tags,
+          links: links,
+          images: images,
+        });
       }
 
       setEntries(fullEntries);
     };
 
     loadWishes();
-  });
+  }, [database, setEntries]);
 
   return (
     <SafeAreaView style={globalStyle.screenContainer}>

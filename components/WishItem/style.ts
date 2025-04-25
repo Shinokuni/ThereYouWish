@@ -34,6 +34,9 @@ const useStyle = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
+  image: {
+    marginEnd: 8,
+  },
 });
 
 export default useStyle;
