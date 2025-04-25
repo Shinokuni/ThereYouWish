@@ -1,5 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Linking, Pressable, SafeAreaView, ScrollView, View} from 'react-native';
+import {
+  FlatList,
+  Linking,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  View,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {
   Appbar,
@@ -16,7 +23,7 @@ import {drizzle} from 'drizzle-orm/expo-sqlite';
 import {useSQLiteContext} from 'expo-sqlite';
 
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
-import {entry, link, Tag, tag, tagJoin, wish} from '../../db/schema';
+import {entry, image, link, Tag, tag, tagJoin, wish} from '../../db/schema';
 import style from './style';
 import useGlobalStyle from '../../components/globalStyle';
 import {getCurrencies, getLocales} from 'react-native-localize';
@@ -24,6 +31,8 @@ import DatePicker from 'react-native-date-picker';
 import TagBottomSheet from '../../components/TagBottomSheet/TagBottomSheet';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import Icon from '@react-native-vector-icons/material-design-icons';
+import {keepLocalCopy, pick, types} from '@react-native-documents/picker';
+import FixedHeightImage from '../../components/FixedHeightImage/FixedHeightImage';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
@@ -50,6 +59,8 @@ const NewWishScreen = () => {
 
   const [tags, setTags] = useState<Tag[]>([]);
   let [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+
+  let [images, setImages] = useState<string[]>([]);
 
   const bottomSheetRef = useRef<BottomSheetModal | null>(null);
 
@@ -108,6 +119,10 @@ const NewWishScreen = () => {
         links.map(newLink => ({url: newLink.toString(), entryId: newEntry.id})),
       );
 
+    await database
+      .insert(image)
+      .values(images.map(newImage => ({url: newImage, entryId: newEntry.id})));
+
     navigation.goBack();
   };
 
@@ -124,7 +139,7 @@ const NewWishScreen = () => {
       </Appbar.Header>
 
       <ScrollView
-        style={globalStyle.screenSpacing}
+        style={{...globalStyle.screenSpacing}}
         showsVerticalScrollIndicator={false}
         automaticallyAdjustKeyboardInsets={true}>
         <Text variant={'labelLarge'} style={style.label}>
@@ -276,25 +291,25 @@ const NewWishScreen = () => {
           </View>
 
           {links.length > 0 &&
-            links.map(link => {
+            links.map(newLink => {
               return (
-                <View key={link.toString()} style={style.linkItem}>
+                <View key={newLink.toString()} style={style.linkItem}>
                   <View style={style.hostContainer}>
                     <Icon name="link" size={24} />
                     <Text
                       variant={'titleMedium'}
                       style={{...style.host, color: theme.colors.primary}}
                       onPress={() => {
-                        Linking.openURL(link.toString());
+                        Linking.openURL(newLink.toString());
                       }}>
-                      {link.host}
+                      {newLink.host}
                     </Text>
                   </View>
                   <IconButton
                     icon={'delete'}
                     size={24}
                     onPress={() => {
-                      links.splice(links.indexOf(link), 1);
+                      links.splice(links.indexOf(newLink), 1);
                       setLinks(links);
                     }}
                   />
@@ -336,18 +351,92 @@ const NewWishScreen = () => {
         <Text variant={'labelLarge'} style={style.label}>
           Images
         </Text>
-        <IconButton icon={'image-plus'} size={24} onPress={() => {}} />
+        <Surface style={style.imageSurface}>
+          <IconButton
+            icon={'image-plus'}
+            size={24}
+            onPress={async () => {
+              try {
+                const files = await pick({
+                  allowMultiSelection: true,
+                  allowVirtualFiles: true, // android only
+                  type: [types.images],
+                });
+
+                if (files.length === 0) {
+                  return;
+                }
+
+                const copyResults = await keepLocalCopy({
+                  files: [
+                    {uri: files[0].uri, fileName: files[0].uri},
+                    ...files.slice(1).map(value => ({
+                      uri: value.uri,
+                      fileName: value.name!!,
+                    })),
+                  ],
+                  destination: 'documentDirectory',
+                });
+
+                images = images.concat(
+                  copyResults
+                    .map(value => value.sourceUri)
+                    .filter(value => !images.some(newImage => value === newImage)),
+                );
+
+                console.log(images);
+                setImages(images);
+                console.log();
+              } catch (err: unknown) {
+                // maybe snackbar to inform the user?
+                console.log(err);
+              }
+            }}
+          />
+          {images.length > 0 && (
+            <FlatList
+              style={style.imageList}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={newImage => newImage}
+              data={images}
+              renderItem={value => {
+                return (
+                  <View style={style.imageContainer}>
+                    <FixedHeightImage
+                      style={style.image}
+                      fixedHeight={150}
+                      key={value.item}
+                      source={{uri: value.item}}
+                    />
+
+                    <IconButton
+                      mode="contained"
+                      icon={'delete'}
+                      style={style.imageDelete}
+                      onPress={() => {
+                        images.splice(images.indexOf(value.item), 1);
+                        setImages(images);
+                      }}
+                    />
+                  </View>
+                );
+              }}
+            />
+          )}
+        </Surface>
+
+        <Button
+          mode="contained"
+          style={style.validate}
+          onPress={async () => {
+            if (checkFields()) {
+              insertWish();
+            }
+          }}>
+          Validate
+        </Button>
       </ScrollView>
-      <Button
-        mode="contained"
-        style={style.validate}
-        onPress={async () => {
-          if (checkFields()) {
-            insertWish();
-          }
-        }}>
-        Validate
-      </Button>
 
       <TagBottomSheet
         tags={tags}

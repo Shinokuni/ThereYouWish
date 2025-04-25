@@ -68,8 +68,27 @@ const style = StyleSheet.create({
     marginEnd: 4,
     marginBottom: 8,
   },
+  imageSurface: {
+    borderRadius: 8,
+    marginBottom: 32,
+  },
+  imageList: {
+    margin: 8,
+  },
+  imageContainer: {
+    marginHorizontal: 4,
+  },
+  image: {
+    zIndex: 1,
+  },
+  imageDelete: {
+    zIndex: 2,
+    position: 'absolute',
+    end: 0,
+    bottom: 0,
+  },
   validate: {
-    bottom: 32,
+    //bottom: 32,
     marginHorizontal: 16,
   },
 });
