@@ -58,11 +58,13 @@ const NewWishScreen = () => {
   const [isLinkError, setIsLinkError] = useState(false);
 
   const [tags, setTags] = useState<Tag[]>([]);
-  let [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
   let [images, setImages] = useState<string[]>([]);
 
   const bottomSheetRef = useRef<BottomSheetModal | null>(null);
+
+  console.log('NewWishScreen');
 
   const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
@@ -446,16 +448,15 @@ const NewWishScreen = () => {
         onAddTag={async tagName => {
           addNewTag(tagName);
         }}
-        selectedTagids={selectedTagIds}
+        selectedTagIds={selectedTagIds}
         onSelectTag={({id}) => {
           if (selectedTagIds.includes(id)) {
-            const index = selectedTagIds.indexOf(id);
-            selectedTagIds.splice(index, 1);
+            setSelectedTagIds(
+              selectedTagIds.filter(currentId => currentId !== id),
+            );
           } else {
-            selectedTagIds.push(id);
+            setSelectedTagIds([...selectedTagIds, id]);
           }
-
-          setSelectedTagIds(selectedTagIds);
         }}
       />
     </SafeAreaView>

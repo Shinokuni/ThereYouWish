@@ -17,8 +17,17 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  search: {
+  searchInputContainer: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
+    marginEnd: 8,
+  },
+  searchInput: {
+    flex: 1,
+    paddingHorizontal: 16,
   },
   tagContainer: {
     flexDirection: 'row',
@@ -33,6 +42,13 @@ const style = StyleSheet.create({
   },
   tagIcon: {
     marginEnd: 8,
+  },
+  placeholder: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  iconButton: {
+    margin: 0,
   },
 });
 

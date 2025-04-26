@@ -3,6 +3,7 @@ import {
   BottomSheetFlatList,
   BottomSheetModal,
   BottomSheetModalProvider,
+  BottomSheetTextInput,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
 import {
@@ -16,11 +17,10 @@ import {View} from 'react-native';
 import {Tag} from '../../db/schema';
 import style from './style';
 import Icon from '@react-native-vector-icons/material-design-icons';
-import TYWTextInput from '../TYWTextInput/TYWTextInput';
 
 type TagBottomSheetProps = {
   tags: Tag[];
-  selectedTagids: number[];
+  selectedTagIds: number[];
   onSelectTag: (tag: Tag) => void;
   onAddTag: (tagName: string) => void;
 };
@@ -32,41 +32,69 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
   const [isTagError, setTagError] = useState(false);
   const theme = useTheme();
 
-  const [tags, setTags] = useState(props.tags);
+  const [tags, setTags] = useState<Tag[]>([...props.tags]);
 
   return (
     <BottomSheetModalProvider>
-      <BottomSheetModal snapPoints={['60%']} ref={ref}>
+      <BottomSheetModal snapPoints={['50%']} ref={ref}>
         <BottomSheetView
           style={{...style.container, backgroundColor: theme.colors.surface}}>
           <View style={style.titleContainer}>
             <Text variant={'headlineSmall'}>Choose tags</Text>
           </View>
-          <View style={style.searchContainer}>
-            <TYWTextInput
-              value={search}
-              onChangeText={value => {
-                setTagError(false);
-                setSearch(value);
 
-                if (value.length > 0) {
-                  setTags(
-                    props.tags.filter(tag =>
-                      tag.name
-                        .toLocaleLowerCase()
-                        .includes(value.toLowerCase()),
-                    ),
-                  );
-                } else {
-                  setTags(props.tags);
-                }
-              }}
-              placeholder={'Search or create a tag...'}
-              moreStyle={style.search}
-            />
+          <View style={style.searchContainer}>
+            <View
+              style={{
+                ...style.searchInputContainer,
+                backgroundColor: theme.colors.secondaryContainer,
+              }}>
+              <Icon name={'magnify'} size={24} />
+              <BottomSheetTextInput
+                multiline={false}
+                numberOfLines={1}
+                defaultValue={search} // use defaultValue={} instead of value={} because of text flickering
+                onChangeText={value => {
+                  setTagError(false);
+                  setSearch(value);
+
+                  if (value.length > 0) {
+                    setTags(
+                      props.tags.filter(tag =>
+                        tag.name
+                          .toLocaleLowerCase()
+                          .includes(value.toLowerCase()),
+                      ),
+                    );
+                  } else {
+                    setTags(props.tags);
+                  }
+                }}
+                placeholder={'Search or create a tag...'}
+                style={{
+                  ...style.searchInput,
+                  backgroundColor: theme.colors.secondaryContainer,
+                }}
+              />
+
+              {search.length > 0 && (
+                <IconButton
+                  icon={'close'}
+                  onPress={() => {
+                    setSearch('');
+                    setTagError(false);
+                    setTags(props.tags);
+                  }}
+                  style={style.iconButton}
+                />
+              )}
+            </View>
+
             <IconButton
+              mode="contained-tonal"
               icon={'tag-plus'}
               disabled={search.length === 0}
+              style={style.iconButton}
               onPress={() => {
                 // this is a business rule, it should be extracted elsewhere
                 if (props.tags.map(value => value.name).includes(search)) {
@@ -74,6 +102,7 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
                 } else {
                   props.onAddTag(search);
                   setSearch('');
+                  setTags(props.tags);
                 }
               }}
             />
@@ -81,41 +110,48 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
           <HelperText type={'error'} visible={isTagError}>
             Tag already exists
           </HelperText>
-          <BottomSheetFlatList
-            ListHeaderComponent={<Text>Tags</Text>}
-            data={tags}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => {
-              return (
-                <TouchableRipple
-                  onPress={() => {
-                    props.onSelectTag(item);
-                  }}>
-                  <View style={style.tagContainer}>
-                    <View style={style.tagNameContainer}>
-                      <Icon
-                        name={'tag'}
-                        size={16}
-                        style={{
-                          ...style.tagIcon,
-                          color: theme.colors.primary,
-                        }}
-                      />
-                      <Text variant={'bodyLarge'}>{item.name}</Text>
-                    </View>
 
-                    {props.selectedTagids.includes(item.id) && (
-                      <Icon
-                        name={'check-bold'}
-                        size={16}
-                        style={{color: theme.colors.primary}}
-                      />
-                    )}
-                  </View>
-                </TouchableRipple>
-              );
-            }}
-          />
+          {tags.length > 0 ? (
+            <BottomSheetFlatList
+              ListHeaderComponent={<Text>Tags</Text>}
+              data={tags}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => {
+                return (
+                  <TouchableRipple
+                    onPress={() => {
+                      props.onSelectTag(item);
+                    }}>
+                    <View style={style.tagContainer}>
+                      <View style={style.tagNameContainer}>
+                        <Icon
+                          name={'tag'}
+                          size={16}
+                          style={{
+                            ...style.tagIcon,
+                            color: theme.colors.primary,
+                          }}
+                        />
+                        <Text variant={'bodyLarge'}>{item.name}</Text>
+                      </View>
+
+                      {props.selectedTagIds.includes(item.id) && (
+                        <Icon
+                          name={'check-bold'}
+                          size={16}
+                          style={{color: theme.colors.primary}}
+                        />
+                      )}
+                    </View>
+                  </TouchableRipple>
+                );
+              }}
+            />
+          ) : (
+            <View style={style.placeholder}>
+              <Text variant={'bodyMedium'}>No tag available</Text>
+            </View>
+          )}
         </BottomSheetView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
