@@ -1,7 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
-  FlatList,
-  Linking,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -32,9 +30,8 @@ import {getCurrencies, getLocales} from 'react-native-localize';
 import DatePicker from 'react-native-date-picker';
 import TagBottomSheet from '../../components/TagBottomSheet/TagBottomSheet';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
-import Icon from '@react-native-vector-icons/material-design-icons';
-import {keepLocalCopy, pick, types} from '@react-native-documents/picker';
-import FixedHeightImage from '../../components/FixedHeightImage/FixedHeightImage';
+import WishLinks from '../../components/WishLinks/WishLinks';
+import WishImages from '../../components/WishImages/WishImages';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
@@ -55,14 +52,14 @@ const NewWishScreen = () => {
   const [dueDate, setDueDate] = useState<Date | null>(null);
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
 
-  let [links, setLinks] = useState<URL[]>([]);
+  const [links, setLinks] = useState<URL[]>([]);
   const [linkValue, setLinkValue] = useState('');
   const [isLinkError, setIsLinkError] = useState(false);
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
-  let [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>([]);
 
   const descriptionRef = useRef<RNTextInput>(null);
   const priceRef = useRef<RNTextInput>(null);
@@ -286,73 +283,28 @@ const NewWishScreen = () => {
           <Text variant={'labelLarge'} style={style.label}>
             Links
           </Text>
-          <Surface style={style.linkSurface}>
-            <View>
-              <TextInput
-                value={linkValue}
-                onChangeText={value => {
-                  setLinkValue(value);
-                  setIsLinkError(false);
-                }}
-                placeholder={'Add link...'}
-                underlineColor="transparent"
-                activeUnderlineColor="transparent"
-                cursorColor={theme.colors.primary}
-                style={style.baseInput}
-                returnKeyType="next"
-                left={<TextInput.Icon icon="link-plus" />}
-                right={
-                  <TextInput.Icon
-                    icon="plus"
-                    onPress={() => {
-                      if (linkValue.length > 0) {
-                        try {
-                          links.push(new URL(linkValue));
-                          setLinks(links);
-                          setLinkValue('');
-                        } catch (e) {
-                          setIsLinkError(true);
-                        }
-                      }
-                    }}
-                  />
+          <WishLinks
+            links={links}
+            linkValue={linkValue}
+            onLinkValueChange={value => {
+              setLinkValue(value);
+              setIsLinkError(false);
+            }}
+            onAddLink={value => {
+              if (value.length > 0) {
+                try {
+                  setLinks([...links, new URL(value)]);
+                  setLinkValue('');
+                } catch (e) {
+                  setIsLinkError(true);
                 }
-              />
-
-              {isLinkError && (
-                <HelperText type={'error'} visible={isLinkError}>
-                  Entered value is not a valid URL
-                </HelperText>
-              )}
-            </View>
-
-            {links.length > 0 &&
-              links.map(newLink => {
-                return (
-                  <View key={newLink.toString()} style={style.linkItem}>
-                    <View style={style.hostContainer}>
-                      <Icon name="link" size={24} />
-                      <Text
-                        variant={'titleMedium'}
-                        style={{...style.host, color: theme.colors.primary}}
-                        onPress={() => {
-                          Linking.openURL(newLink.toString());
-                        }}>
-                        {newLink.host}
-                      </Text>
-                    </View>
-                    <IconButton
-                      icon={'delete'}
-                      size={24}
-                      onPress={() => {
-                        links.splice(links.indexOf(newLink), 1);
-                        setLinks(links);
-                      }}
-                    />
-                  </View>
-                );
-              })}
-          </Surface>
+              }
+            }}
+            onRemoveLink={value => {
+              setLinks(links.filter(currentValue => currentValue !== value));
+            }}
+            isLinkError={isLinkError}
+          />
 
           <Text variant={'labelLarge'} style={style.label}>
             Tags
@@ -387,82 +339,20 @@ const NewWishScreen = () => {
           <Text variant={'labelLarge'} style={style.label}>
             Images
           </Text>
-          <Surface style={style.imageSurface}>
-            <IconButton
-              icon={'image-plus'}
-              size={24}
-              onPress={async () => {
-                try {
-                  const files = await pick({
-                    allowMultiSelection: true,
-                    allowVirtualFiles: true, // android only
-                    type: [types.images],
-                  });
-
-                  if (files.length === 0) {
-                    return;
-                  }
-
-                  const copyResults = await keepLocalCopy({
-                    files: [
-                      {uri: files[0].uri, fileName: files[0].uri},
-                      ...files.slice(1).map(value => ({
-                        uri: value.uri,
-                        fileName: value.name!!,
-                      })),
-                    ],
-                    destination: 'documentDirectory',
-                  });
-
-                  images = images.concat(
-                    copyResults
-                      .filter(value => value.status === 'success')
-                      .map(value => value.localUri)
-                      .filter(
-                        value => !images.some(newImage => value === newImage),
-                      ),
-                  );
-
-                  setImages(images);
-                  console.log();
-                } catch (err: unknown) {
-                  // maybe snackbar to inform the user?
-                  console.log(err);
-                }
-              }}
-            />
-            {images.length > 0 && (
-              <FlatList
-                style={style.imageList}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={newImage => newImage}
-                data={images}
-                renderItem={value => {
-                  return (
-                    <View style={style.imageContainer}>
-                      <FixedHeightImage
-                        style={style.image}
-                        fixedHeight={150}
-                        key={value.item}
-                        source={{uri: value.item}}
-                      />
-
-                      <IconButton
-                        mode="contained"
-                        icon={'delete'}
-                        style={style.imageDelete}
-                        onPress={() => {
-                          images.splice(images.indexOf(value.item), 1);
-                          setImages(images);
-                        }}
-                      />
-                    </View>
-                  );
-                }}
-              />
-            )}
-          </Surface>
+          <WishImages
+            images={images}
+            onAddImages={values => {
+              const filteredValues = values.filter(
+                value => !images.some(newImage => value === newImage),
+              );
+              setImages(images.concat(filteredValues));
+            }}
+            onRemoveImage={value => {
+              setImages(
+                images.filter(filteredValue => filteredValue !== value),
+              );
+            }}
+          />
 
           <Button
             mode="contained"

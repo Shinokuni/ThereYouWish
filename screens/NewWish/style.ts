@@ -30,23 +30,6 @@ const style = StyleSheet.create({
   priceDateInput: {
     paddingStart: 0,
   },
-  linkSurface: {
-    marginBottom: 16,
-    borderRadius: 8,
-  },
-  linkItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingStart: 8,
-  },
-  hostContainer: {
-    flexDirection: 'row',
-  },
-  host: {
-    marginStart: 8,
-    textDecorationLine: 'underline',
-  },
   tagSurface: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -68,27 +51,7 @@ const style = StyleSheet.create({
     marginEnd: 4,
     marginBottom: 8,
   },
-  imageSurface: {
-    borderRadius: 8,
-    marginBottom: 32,
-  },
-  imageList: {
-    margin: 8,
-  },
-  imageContainer: {
-    marginHorizontal: 4,
-  },
-  image: {
-    zIndex: 1,
-  },
-  imageDelete: {
-    zIndex: 2,
-    position: 'absolute',
-    end: 0,
-    bottom: 0,
-  },
   validate: {
-    //bottom: 32,
     marginHorizontal: 16,
   },
 });
