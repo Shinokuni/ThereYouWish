@@ -2,14 +2,14 @@ import {StyleSheet} from 'react-native';
 
 const style = StyleSheet.create({
   descriptionInput: {
-    height: 125,
+    minHeight: 125,
     marginBottom: 16,
   },
   baseInput: {
     borderRadius: 8,
     borderTopStartRadius: 8,
-    paddingStart: 8,
     borderTopEndRadius: 8,
+    paddingStart: 8,
   },
   label: {
     marginBottom: 4,

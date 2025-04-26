@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   ScrollView,
   View,
+  TextInput as RNTextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {
@@ -62,9 +64,9 @@ const NewWishScreen = () => {
 
   let [images, setImages] = useState<string[]>([]);
 
+  const descriptionRef = useRef<RNTextInput>(null);
+  const priceRef = useRef<RNTextInput>(null);
   const bottomSheetRef = useRef<BottomSheetModal | null>(null);
-
-  console.log('NewWishScreen');
 
   const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
@@ -140,81 +142,86 @@ const NewWishScreen = () => {
         <Appbar.Content title="New wish" />
       </Appbar.Header>
 
-      <ScrollView
-        style={{...globalStyle.screenSpacing}}
-        showsVerticalScrollIndicator={false}
-        automaticallyAdjustKeyboardInsets={true}>
-        <Text variant={'labelLarge'} style={style.label}>
-          Title*
-        </Text>
-        <TextInput
-          value={title}
-          onChangeText={value => {
-            setTitle(value);
-            setTitleError(false);
-          }}
-          mode="flat"
-          placeholder={'Enter a title...'}
-          numberOfLines={1}
-          error={isTitleError}
-          right={<TextInput.Icon icon="close" onPress={() => setTitle('')} />}
-          style={style.baseInput}
-          underlineColor="transparent"
-          activeUnderlineColor="transparent"
-          cursorColor={theme.colors.primary}
-        />
-        <HelperText type="error" visible={isTitleError}>
-          Title can't be empty
-        </HelperText>
+      <KeyboardAvoidingView behavior="padding">
+        <ScrollView
+          style={{...globalStyle.screenSpacing}}
+          showsVerticalScrollIndicator={false}
+          automaticallyAdjustKeyboardInsets={true}>
+          <Text variant={'labelLarge'} style={style.label}>
+            Title*
+          </Text>
+          <TextInput
+            value={title}
+            onChangeText={value => {
+              setTitle(value);
+              setTitleError(false);
+            }}
+            mode="flat"
+            placeholder={'Enter a title...'}
+            numberOfLines={1}
+            error={isTitleError}
+            right={
+              title.length > 0 ? (
+                <TextInput.Icon icon="close" onPress={() => setTitle('')} />
+              ) : (
+                <View />
+              )
+            }
+            style={style.baseInput}
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            cursorColor={theme.colors.primary}
+            returnKeyType="next"
+            blurOnSubmit={false}
+            onSubmitEditing={() => {
+              descriptionRef.current?.focus();
+            }}
+          />
+          <HelperText type="error" visible={isTitleError}>
+            Title can't be empty
+          </HelperText>
 
-        <Text variant={'labelLarge'} style={style.label}>
-          Description
-        </Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          style={[style.baseInput, style.descriptionInput]}
-          placeholder={'Enter a description...'}
-          multiline={true}
-          underlineColor="transparent"
-          activeUnderlineColor="transparent"
-          cursorColor={theme.colors.primary}
-        />
+          <Text variant={'labelLarge'} style={style.label}>
+            Description
+          </Text>
+          <TextInput
+            ref={descriptionRef}
+            value={description}
+            onChangeText={setDescription}
+            style={[style.baseInput, style.descriptionInput]}
+            placeholder={'Enter a description...'}
+            multiline={true}
+            numberOfLines={5}
+            right={
+              description.length > 0 ? (
+                <TextInput.Icon
+                  icon="close"
+                  onPress={() => setDescription('')}
+                />
+              ) : (
+                <View />
+              )
+            }
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            cursorColor={theme.colors.primary}
+            returnKeyType="next"
+            blurOnSubmit={true}
+            onSubmitEditing={() => {
+              priceRef.current?.focus();
+            }}
+          />
 
-        <View style={style.priceDateContainer}>
-          <View style={style.priceContainer}>
-            <Text variant={'labelLarge'} style={style.label}>
-              Price
-            </Text>
-            <TextInput
-              value={price}
-              onChangeText={setPrice}
-              placeholder={'Enter a price'}
-              keyboardType="numeric"
-              numberOfLines={1}
-              style={style.baseInput}
-              underlineColor="transparent"
-              activeUnderlineColor="transparent"
-              cursorColor={theme.colors.primary}
-              contentStyle={style.priceDateInput}
-              left={
-                <TextInput.Icon icon={`currency-${currency.toLowerCase()}`} />
-              }
-            />
-          </View>
-
-          <View style={style.dateContainer}>
-            <Text variant={'labelLarge'} style={style.label}>
-              Due date
-            </Text>
-            <Pressable
-              onPress={() => {
-                setDatePickerOpen(true);
-              }}>
+          <View style={style.priceDateContainer}>
+            <View style={style.priceContainer}>
+              <Text variant={'labelLarge'} style={style.label}>
+                Price
+              </Text>
               <TextInput
-                value={dueDate?.toLocaleDateString(locale.languageCode)}
-                editable={false}
-                placeholder={'due date'}
+                ref={priceRef}
+                value={price}
+                onChangeText={setPrice}
+                placeholder={'Enter a price'}
                 keyboardType="numeric"
                 numberOfLines={1}
                 style={style.baseInput}
@@ -223,224 +230,252 @@ const NewWishScreen = () => {
                 cursorColor={theme.colors.primary}
                 contentStyle={style.priceDateInput}
                 left={
+                  <TextInput.Icon icon={`currency-${currency.toLowerCase()}`} />
+                }
+                returnKeyType="next"
+              />
+            </View>
+
+            <View style={style.dateContainer}>
+              <Text variant={'labelLarge'} style={style.label}>
+                Deadline
+              </Text>
+              <Pressable
+                onPress={() => {
+                  setDatePickerOpen(true);
+                }}>
+                <TextInput
+                  value={dueDate?.toLocaleDateString(locale.languageCode)}
+                  editable={false}
+                  placeholder={'Deadline'}
+                  keyboardType="numeric"
+                  numberOfLines={1}
+                  style={style.baseInput}
+                  underlineColor="transparent"
+                  activeUnderlineColor="transparent"
+                  cursorColor={theme.colors.primary}
+                  contentStyle={style.priceDateInput}
+                  left={
+                    <TextInput.Icon
+                      icon={'calendar-edit'}
+                      onPress={() => {
+                        setDatePickerOpen(true);
+                      }}
+                    />
+                  }
+                />
+              </Pressable>
+
+              <DatePicker
+                modal
+                mode="date"
+                locale={locale.languageCode}
+                open={isDatePickerOpen}
+                date={new Date()}
+                onConfirm={date => {
+                  setDatePickerOpen(false);
+                  setDueDate(date);
+                }}
+                onCancel={() => {
+                  setDatePickerOpen(false);
+                }}
+              />
+            </View>
+          </View>
+
+          <Text variant={'labelLarge'} style={style.label}>
+            Links
+          </Text>
+          <Surface style={style.linkSurface}>
+            <View>
+              <TextInput
+                value={linkValue}
+                onChangeText={value => {
+                  setLinkValue(value);
+                  setIsLinkError(false);
+                }}
+                placeholder={'Add link...'}
+                underlineColor="transparent"
+                activeUnderlineColor="transparent"
+                cursorColor={theme.colors.primary}
+                style={style.baseInput}
+                returnKeyType="next"
+                left={<TextInput.Icon icon="link-plus" />}
+                right={
                   <TextInput.Icon
-                    icon={'calendar-edit'}
+                    icon="plus"
                     onPress={() => {
-                      setDatePickerOpen(true);
+                      if (linkValue.length > 0) {
+                        try {
+                          links.push(new URL(linkValue));
+                          setLinks(links);
+                          setLinkValue('');
+                        } catch (e) {
+                          setIsLinkError(true);
+                        }
+                      }
                     }}
                   />
                 }
               />
-            </Pressable>
 
-            <DatePicker
-              modal
-              mode="date"
-              locale={locale.languageCode}
-              open={isDatePickerOpen}
-              date={new Date()}
-              onConfirm={date => {
-                setDatePickerOpen(false);
-                setDueDate(date);
-              }}
-              onCancel={() => {
-                setDatePickerOpen(false);
-              }}
-            />
-          </View>
-        </View>
+              {isLinkError && (
+                <HelperText type={'error'} visible={isLinkError}>
+                  Entered value is not a valid URL
+                </HelperText>
+              )}
+            </View>
 
-        <Text variant={'labelLarge'} style={style.label}>
-          Links
-        </Text>
-        <Surface style={style.linkSurface}>
-          <View>
-            <TextInput
-              value={linkValue}
-              onChangeText={value => {
-                setLinkValue(value);
-                setIsLinkError(false);
-              }}
-              placeholder={'Add link...'}
-              underlineColor="transparent"
-              activeUnderlineColor="transparent"
-              cursorColor={theme.colors.primary}
-              style={style.baseInput}
-              left={<TextInput.Icon icon="link-plus" />}
-              right={
-                <TextInput.Icon
-                  icon="plus"
-                  onPress={() => {
-                    if (linkValue.length > 0) {
-                      try {
-                        links.push(new URL(linkValue));
-                        setLinks(links);
-                        setLinkValue('');
-                      } catch (e) {
-                        setIsLinkError(true);
-                      }
-                    }
-                  }}
-                />
-              }
-            />
-
-            {isLinkError && (
-              <HelperText type={'error'} visible={isLinkError}>
-                Entered value is not a valid URL
-              </HelperText>
-            )}
-          </View>
-
-          {links.length > 0 &&
-            links.map(newLink => {
-              return (
-                <View key={newLink.toString()} style={style.linkItem}>
-                  <View style={style.hostContainer}>
-                    <Icon name="link" size={24} />
-                    <Text
-                      variant={'titleMedium'}
-                      style={{...style.host, color: theme.colors.primary}}
-                      onPress={() => {
-                        Linking.openURL(newLink.toString());
-                      }}>
-                      {newLink.host}
-                    </Text>
-                  </View>
-                  <IconButton
-                    icon={'delete'}
-                    size={24}
-                    onPress={() => {
-                      links.splice(links.indexOf(newLink), 1);
-                      setLinks(links);
-                    }}
-                  />
-                </View>
-              );
-            })}
-        </Surface>
-
-        <Text variant={'labelLarge'} style={style.label}>
-          Tags
-        </Text>
-        <Pressable
-          onPress={() => {
-            bottomSheetRef.current?.present();
-          }}>
-          <Surface style={style.tagSurface} mode="flat">
-            <IconButton mode={'contained-tonal'} icon={'tag'} size={24} />
-
-            {selectedTagIds.length === 0 ? (
-              <View style={style.tagMessage}>
-                <Text>Add tag</Text>
-              </View>
-            ) : (
-              <View style={style.tagList}>
-                {selectedTagIds.map(id => {
-                  const selectedTag = tags.find(value => value.id === id)!!;
-
-                  return (
-                    <Chip key={id} style={style.tag}>
-                      {selectedTag.name}
-                    </Chip>
-                  );
-                })}
-              </View>
-            )}
-          </Surface>
-        </Pressable>
-
-        <Text variant={'labelLarge'} style={style.label}>
-          Images
-        </Text>
-        <Surface style={style.imageSurface}>
-          <IconButton
-            icon={'image-plus'}
-            size={24}
-            onPress={async () => {
-              try {
-                const files = await pick({
-                  allowMultiSelection: true,
-                  allowVirtualFiles: true, // android only
-                  type: [types.images],
-                });
-
-                if (files.length === 0) {
-                  return;
-                }
-
-                const copyResults = await keepLocalCopy({
-                  files: [
-                    {uri: files[0].uri, fileName: files[0].uri},
-                    ...files.slice(1).map(value => ({
-                      uri: value.uri,
-                      fileName: value.name!!,
-                    })),
-                  ],
-                  destination: 'documentDirectory',
-                });
-
-                images = images.concat(
-                  copyResults
-                    .filter(value => value.status === 'success')
-                    .map(value => value.localUri)
-                    .filter(
-                      value => !images.some(newImage => value === newImage),
-                    ),
-                );
-
-                setImages(images);
-                console.log();
-              } catch (err: unknown) {
-                // maybe snackbar to inform the user?
-                console.log(err);
-              }
-            }}
-          />
-          {images.length > 0 && (
-            <FlatList
-              style={style.imageList}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={newImage => newImage}
-              data={images}
-              renderItem={value => {
+            {links.length > 0 &&
+              links.map(newLink => {
                 return (
-                  <View style={style.imageContainer}>
-                    <FixedHeightImage
-                      style={style.image}
-                      fixedHeight={150}
-                      key={value.item}
-                      source={{uri: value.item}}
-                    />
-
+                  <View key={newLink.toString()} style={style.linkItem}>
+                    <View style={style.hostContainer}>
+                      <Icon name="link" size={24} />
+                      <Text
+                        variant={'titleMedium'}
+                        style={{...style.host, color: theme.colors.primary}}
+                        onPress={() => {
+                          Linking.openURL(newLink.toString());
+                        }}>
+                        {newLink.host}
+                      </Text>
+                    </View>
                     <IconButton
-                      mode="contained"
                       icon={'delete'}
-                      style={style.imageDelete}
+                      size={24}
                       onPress={() => {
-                        images.splice(images.indexOf(value.item), 1);
-                        setImages(images);
+                        links.splice(links.indexOf(newLink), 1);
+                        setLinks(links);
                       }}
                     />
                   </View>
                 );
+              })}
+          </Surface>
+
+          <Text variant={'labelLarge'} style={style.label}>
+            Tags
+          </Text>
+          <Pressable
+            onPress={() => {
+              bottomSheetRef.current?.present();
+            }}>
+            <Surface style={style.tagSurface} mode="flat">
+              <IconButton mode={'contained-tonal'} icon={'tag'} size={24} />
+
+              {selectedTagIds.length === 0 ? (
+                <View style={style.tagMessage}>
+                  <Text>Add tag</Text>
+                </View>
+              ) : (
+                <View style={style.tagList}>
+                  {selectedTagIds.map(id => {
+                    const selectedTag = tags.find(value => value.id === id)!!;
+
+                    return (
+                      <Chip key={id} style={style.tag}>
+                        {selectedTag.name}
+                      </Chip>
+                    );
+                  })}
+                </View>
+              )}
+            </Surface>
+          </Pressable>
+
+          <Text variant={'labelLarge'} style={style.label}>
+            Images
+          </Text>
+          <Surface style={style.imageSurface}>
+            <IconButton
+              icon={'image-plus'}
+              size={24}
+              onPress={async () => {
+                try {
+                  const files = await pick({
+                    allowMultiSelection: true,
+                    allowVirtualFiles: true, // android only
+                    type: [types.images],
+                  });
+
+                  if (files.length === 0) {
+                    return;
+                  }
+
+                  const copyResults = await keepLocalCopy({
+                    files: [
+                      {uri: files[0].uri, fileName: files[0].uri},
+                      ...files.slice(1).map(value => ({
+                        uri: value.uri,
+                        fileName: value.name!!,
+                      })),
+                    ],
+                    destination: 'documentDirectory',
+                  });
+
+                  images = images.concat(
+                    copyResults
+                      .filter(value => value.status === 'success')
+                      .map(value => value.localUri)
+                      .filter(
+                        value => !images.some(newImage => value === newImage),
+                      ),
+                  );
+
+                  setImages(images);
+                  console.log();
+                } catch (err: unknown) {
+                  // maybe snackbar to inform the user?
+                  console.log(err);
+                }
               }}
             />
-          )}
-        </Surface>
+            {images.length > 0 && (
+              <FlatList
+                style={style.imageList}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={newImage => newImage}
+                data={images}
+                renderItem={value => {
+                  return (
+                    <View style={style.imageContainer}>
+                      <FixedHeightImage
+                        style={style.image}
+                        fixedHeight={150}
+                        key={value.item}
+                        source={{uri: value.item}}
+                      />
 
-        <Button
-          mode="contained"
-          style={style.validate}
-          onPress={async () => {
-            if (checkFields()) {
-              insertWish();
-            }
-          }}>
-          Validate
-        </Button>
-      </ScrollView>
+                      <IconButton
+                        mode="contained"
+                        icon={'delete'}
+                        style={style.imageDelete}
+                        onPress={() => {
+                          images.splice(images.indexOf(value.item), 1);
+                          setImages(images);
+                        }}
+                      />
+                    </View>
+                  );
+                }}
+              />
+            )}
+          </Surface>
+
+          <Button
+            mode="contained"
+            style={style.validate}
+            onPress={async () => {
+              if (checkFields()) {
+                insertWish();
+              }
+            }}>
+            Validate
+          </Button>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <TagBottomSheet
         tags={tags}
