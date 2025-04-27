@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useMemo, useRef} from 'react';
 import {
   Pressable,
   SafeAreaView,
@@ -19,11 +19,7 @@ import {
   TextInput,
   useTheme,
 } from 'react-native-paper';
-import {drizzle} from 'drizzle-orm/expo-sqlite';
-import {useSQLiteContext} from 'expo-sqlite';
 
-import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
-import {entry, image, link, Tag, tag, tagJoin, wish} from '../../db/schema';
 import style from './style';
 import useGlobalStyle from '../../components/globalStyle';
 import {getCurrencies, getLocales} from 'react-native-localize';
@@ -32,100 +28,21 @@ import TagBottomSheet from '../../components/TagBottomSheet/TagBottomSheet';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import WishLinks from '../../components/WishLinks/WishLinks';
 import WishImages from '../../components/WishImages/WishImages';
+import useNewWishViewModel from './NewWishViewModel';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
-  const drawerContext = useDrawerContext();
   const theme = useTheme();
   const globalStyle = useGlobalStyle();
 
-  const expo = useSQLiteContext();
-  const database = useMemo(() => drizzle(expo), [expo]);
+  const viewModel = useNewWishViewModel();
 
   const [currency] = useMemo(() => getCurrencies(), []);
   const [locale] = useMemo(() => getLocales(), []);
 
-  const [title, setTitle] = useState('');
-  const [isTitleError, setTitleError] = useState(false);
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [dueDate, setDueDate] = useState<Date | null>(null);
-  const [isDatePickerOpen, setDatePickerOpen] = useState(false);
-
-  const [links, setLinks] = useState<URL[]>([]);
-  const [linkValue, setLinkValue] = useState('');
-  const [isLinkError, setIsLinkError] = useState(false);
-
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
-
-  const [images, setImages] = useState<string[]>([]);
-
   const descriptionRef = useRef<RNTextInput>(null);
   const priceRef = useRef<RNTextInput>(null);
   const bottomSheetRef = useRef<BottomSheetModal | null>(null);
-
-  const loadTags = useCallback(async () => {
-    const newTags = await database.select().from(tag);
-    setTags(newTags);
-  }, [database, setTags]);
-
-  useEffect(() => {
-    loadTags();
-  }, [loadTags]);
-
-  const addNewTag = async (name: string) => {
-    await database.insert(tag).values({name: name});
-    loadTags();
-  };
-
-  const checkFields = () => {
-    if (title.length > 0) {
-      return true;
-    } else {
-      setTitleError(true);
-      return false;
-    }
-  };
-
-  const insertWish = async () => {
-    const [newWish] = await database
-      .insert(wish)
-      .values({
-        name: title,
-        collectionId: drawerContext!!.drawerState.collectionId,
-      })
-      .returning({id: wish.id});
-
-    const [newEntry] = await database
-      .insert(entry)
-      .values({
-        name: title,
-        description: description,
-        price: parseFloat(price),
-        state: WishState.ongoing,
-        wishId: newWish.id,
-      })
-      .returning({id: entry.id});
-
-    await database
-      .insert(tagJoin)
-      .values(
-        selectedTagIds.map(value => ({entryId: newEntry.id, tagId: value})),
-      );
-
-    await database
-      .insert(link)
-      .values(
-        links.map(newLink => ({url: newLink.toString(), entryId: newEntry.id})),
-      );
-
-    await database
-      .insert(image)
-      .values(images.map(newImage => ({url: newImage, entryId: newEntry.id})));
-
-    navigation.goBack();
-  };
 
   return (
     <SafeAreaView style={globalStyle.screenContainer}>
@@ -148,18 +65,21 @@ const NewWishScreen = () => {
             Title*
           </Text>
           <TextInput
-            value={title}
+            value={viewModel.title}
             onChangeText={value => {
-              setTitle(value);
-              setTitleError(false);
+              viewModel.setTitle(value);
+              viewModel.setTitleError(false);
             }}
             mode="flat"
             placeholder={'Enter a title...'}
             numberOfLines={1}
-            error={isTitleError}
+            error={viewModel.isTitleError}
             right={
-              title.length > 0 ? (
-                <TextInput.Icon icon="close" onPress={() => setTitle('')} />
+              viewModel.title.length > 0 ? (
+                <TextInput.Icon
+                  icon="close"
+                  onPress={() => viewModel.setTitle('')}
+                />
               ) : (
                 <View />
               )
@@ -174,7 +94,7 @@ const NewWishScreen = () => {
               descriptionRef.current?.focus();
             }}
           />
-          <HelperText type="error" visible={isTitleError}>
+          <HelperText type="error" visible={viewModel.isTitleError}>
             Title can't be empty
           </HelperText>
 
@@ -183,17 +103,17 @@ const NewWishScreen = () => {
           </Text>
           <TextInput
             ref={descriptionRef}
-            value={description}
-            onChangeText={setDescription}
+            value={viewModel.description}
+            onChangeText={viewModel.setDescription}
             style={[style.baseInput, style.descriptionInput]}
             placeholder={'Enter a description...'}
             multiline={true}
             numberOfLines={5}
             right={
-              description.length > 0 ? (
+              viewModel.description.length > 0 ? (
                 <TextInput.Icon
                   icon="close"
-                  onPress={() => setDescription('')}
+                  onPress={() => viewModel.setDescription('')}
                 />
               ) : (
                 <View />
@@ -216,8 +136,8 @@ const NewWishScreen = () => {
               </Text>
               <TextInput
                 ref={priceRef}
-                value={price}
-                onChangeText={setPrice}
+                value={viewModel.price}
+                onChangeText={viewModel.setPrice}
                 placeholder={'Enter a price'}
                 keyboardType="numeric"
                 numberOfLines={1}
@@ -239,10 +159,12 @@ const NewWishScreen = () => {
               </Text>
               <Pressable
                 onPress={() => {
-                  setDatePickerOpen(true);
+                  viewModel.setDatePickerOpen(true);
                 }}>
                 <TextInput
-                  value={dueDate?.toLocaleDateString(locale.languageCode)}
+                  value={viewModel.dueDate?.toLocaleDateString(
+                    locale.languageCode,
+                  )}
                   editable={false}
                   placeholder={'Deadline'}
                   keyboardType="numeric"
@@ -256,7 +178,7 @@ const NewWishScreen = () => {
                     <TextInput.Icon
                       icon={'calendar-edit'}
                       onPress={() => {
-                        setDatePickerOpen(true);
+                        viewModel.setDatePickerOpen(true);
                       }}
                     />
                   }
@@ -267,14 +189,14 @@ const NewWishScreen = () => {
                 modal
                 mode="date"
                 locale={locale.languageCode}
-                open={isDatePickerOpen}
+                open={viewModel.isDatePickerOpen}
                 date={new Date()}
                 onConfirm={date => {
-                  setDatePickerOpen(false);
-                  setDueDate(date);
+                  viewModel.setDatePickerOpen(false);
+                  viewModel.setDueDate(date);
                 }}
                 onCancel={() => {
-                  setDatePickerOpen(false);
+                  viewModel.setDatePickerOpen(false);
                 }}
               />
             </View>
@@ -284,26 +206,28 @@ const NewWishScreen = () => {
             Links
           </Text>
           <WishLinks
-            links={links}
-            linkValue={linkValue}
+            links={viewModel.links}
+            linkValue={viewModel.linkValue}
             onLinkValueChange={value => {
-              setLinkValue(value);
-              setIsLinkError(false);
+              viewModel.setLinkValue(value);
+              viewModel.setIsLinkError(false);
             }}
             onAddLink={value => {
               if (value.length > 0) {
                 try {
-                  setLinks([...links, new URL(value)]);
-                  setLinkValue('');
+                  viewModel.setLinks([...viewModel.links, new URL(value)]);
+                  viewModel.setLinkValue('');
                 } catch (e) {
-                  setIsLinkError(true);
+                  viewModel.setIsLinkError(true);
                 }
               }
             }}
             onRemoveLink={value => {
-              setLinks(links.filter(currentValue => currentValue !== value));
+              viewModel.setLinks(
+                viewModel.links.filter(currentValue => currentValue !== value),
+              );
             }}
-            isLinkError={isLinkError}
+            isLinkError={viewModel.isLinkError}
           />
 
           <Text variant={'labelLarge'} style={style.label}>
@@ -316,14 +240,16 @@ const NewWishScreen = () => {
             <Surface style={style.tagSurface} mode="flat">
               <IconButton mode={'contained-tonal'} icon={'tag'} size={24} />
 
-              {selectedTagIds.length === 0 ? (
+              {viewModel.selectedTagIds.length === 0 ? (
                 <View style={style.tagMessage}>
                   <Text>Add tag</Text>
                 </View>
               ) : (
                 <View style={style.tagList}>
-                  {selectedTagIds.map(id => {
-                    const selectedTag = tags.find(value => value.id === id)!!;
+                  {viewModel.selectedTagIds.map(id => {
+                    const selectedTag = viewModel.tags.find(
+                      value => value.id === id,
+                    )!!;
 
                     return (
                       <Chip key={id} style={style.tag}>
@@ -340,16 +266,18 @@ const NewWishScreen = () => {
             Images
           </Text>
           <WishImages
-            images={images}
+            images={viewModel.images}
             onAddImages={values => {
               const filteredValues = values.filter(
-                value => !images.some(newImage => value === newImage),
+                value => !viewModel.images.some(newImage => value === newImage),
               );
-              setImages(images.concat(filteredValues));
+              viewModel.setImages(viewModel.images.concat(filteredValues));
             }}
             onRemoveImage={value => {
-              setImages(
-                images.filter(filteredValue => filteredValue !== value),
+              viewModel.setImages(
+                viewModel.images.filter(
+                  filteredValue => filteredValue !== value,
+                ),
               );
             }}
           />
@@ -358,8 +286,9 @@ const NewWishScreen = () => {
             mode="contained"
             style={style.validate}
             onPress={async () => {
-              if (checkFields()) {
-                insertWish();
+              if (viewModel.checkFields()) {
+                viewModel.insertWish();
+                navigation.goBack();
               }
             }}>
             Validate
@@ -368,19 +297,19 @@ const NewWishScreen = () => {
       </KeyboardAvoidingView>
 
       <TagBottomSheet
-        tags={tags}
+        tags={viewModel.tags}
         ref={bottomSheetRef}
         onAddTag={async tagName => {
-          addNewTag(tagName);
+          viewModel.addNewTag(tagName);
         }}
-        selectedTagIds={selectedTagIds}
+        selectedTagIds={viewModel.selectedTagIds}
         onSelectTag={({id}) => {
-          if (selectedTagIds.includes(id)) {
-            setSelectedTagIds(
-              selectedTagIds.filter(currentId => currentId !== id),
+          if (viewModel.selectedTagIds.includes(id)) {
+            viewModel.setSelectedTagIds(
+              viewModel.selectedTagIds.filter(currentId => currentId !== id),
             );
           } else {
-            setSelectedTagIds([...selectedTagIds, id]);
+            viewModel.setSelectedTagIds([...viewModel.selectedTagIds, id]);
           }
         }}
       />
