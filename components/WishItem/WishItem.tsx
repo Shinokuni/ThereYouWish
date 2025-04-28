@@ -1,12 +1,14 @@
 import React from 'react';
+import {FlatList, Linking, Share, View} from 'react-native';
+import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
+import {getCurrencies, getLocales} from 'react-native-localize';
+import Icon from '@react-native-vector-icons/material-design-icons';
 
 import {Entry, Image, Link, Tag, Wish} from '../../db/schema';
-import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
 import style from './style';
-import {FlatList, Linking, View} from 'react-native';
-import {getCurrencies, getLocales} from 'react-native-localize';
 import DropdownMenu from '../DropdownMenu/DropdownMenu';
 import FixedHeightImage from '../FixedHeightImage/FixedHeightImage';
+import {WishState} from '../../contexts/DrawerContext';
 
 const formatPrice = (price: number) => {
   const [locale] = getLocales();
@@ -22,6 +24,7 @@ const formatPrice = (price: number) => {
 type WishItemProps = {
   fullWish: FullWish;
   onDeleteWish: () => void;
+  onUpdateWishState: () => void;
 };
 
 export interface FullWish {
@@ -36,7 +39,11 @@ export interface FullEntry {
   images: Image[];
 }
 
-const WishItem = ({fullWish, onDeleteWish}: WishItemProps) => {
+const WishItem = ({
+  fullWish,
+  onDeleteWish,
+  onUpdateWishState,
+}: WishItemProps) => {
   const [fullEntry] = fullWish.entries;
   const tags = fullEntry.tags;
   const links = fullEntry.links;
@@ -44,6 +51,9 @@ const WishItem = ({fullWish, onDeleteWish}: WishItemProps) => {
   const entry = fullEntry.entry;
 
   const theme = useTheme();
+
+  console.log(entry.state);
+  console.log(entry.state === WishState.ongoing);
 
   return (
     <Card style={{...style.container}}>
@@ -104,42 +114,72 @@ const WishItem = ({fullWish, onDeleteWish}: WishItemProps) => {
       )}
 
       <View style={style.iconContainer}>
-        {links.length > 0 &&
-          (links.length === 1 ? (
-            <IconButton
-              icon={'open-in-new'}
-              style={style.link}
-              onPress={() => {
-                Linking.openURL(links[0].url);
-              }}
-            />
-          ) : (
-            <DropdownMenu
-              actions={links.map(value => ({
-                name: new URL(value.url).host,
-                onClick: () => {
-                  Linking.openURL(value.url);
-                },
-              }))}
-              icon={'open-in-new'}
-              style={style.link}
-            />
-          ))}
-        <DropdownMenu
-          actions={[
-            {
-              name: 'Edit',
-              onClick: () => {},
-            },
-            {
-              name: 'Delete',
-              onClick: () => {
-                onDeleteWish();
+        {entry.deadline && (
+          <View style={style.leftIconContainer}>
+            <Icon name={'timer-sand'} size={16} style={style.link} />
+            <Text variant={'bodyMedium'}>
+              {entry.deadline.toLocaleDateString()}
+            </Text>
+          </View>
+        )}
+
+        <View style={style.rightIconContainer}>
+          <IconButton
+            icon={entry.state === WishState.ongoing ? 'check' : 'refresh'}
+            style={style.actions}
+            onPress={() => {
+              onUpdateWishState();
+            }}
+          />
+          {links.length > 0 &&
+            (links.length === 1 ? (
+              <IconButton
+                icon={'open-in-new'}
+                style={style.link}
+                onPress={() => {
+                  Linking.openURL(links[0].url);
+                }}
+              />
+            ) : (
+              <DropdownMenu
+                actions={links.map(value => ({
+                  name: new URL(value.url).host,
+                  onClick: () => {
+                    Linking.openURL(value.url);
+                  },
+                }))}
+                icon={'open-in-new'}
+                style={style.actions}
+              />
+            ))}
+
+          <IconButton
+            icon={'share-variant'}
+            style={style.actions}
+            onPress={() => {
+              Share.share({
+                message: `${entry.name}${
+                  entry.price ? ' - ' + formatPrice(entry.price) : ''
+                }\n${links.length > 0 ? links[0].url : ''}`,
+              });
+            }}
+          />
+          <DropdownMenu
+            actions={[
+              {
+                name: 'Edit',
+                onClick: () => {},
               },
-            },
-          ]}
-          style={style.actions}
-        />
+              {
+                name: 'Delete',
+                onClick: () => {
+                  onDeleteWish();
+                },
+              },
+            ]}
+            style={style.actions}
+          />
+        </View>
       </View>
     </Card>
   );

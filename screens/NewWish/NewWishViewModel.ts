@@ -13,7 +13,7 @@ const useNewWishViewModel = () => {
   const [isTitleError, setTitleError] = useState(false);
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [dueDate, setDueDate] = useState<Date | null>(null);
+  const [deadline, setDeadline] = useState<Date | null>(null);
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
 
   const [links, setLinks] = useState<URL[]>([]);
@@ -64,6 +64,7 @@ const useNewWishViewModel = () => {
         description: description,
         price: parseFloat(price),
         state: WishState.ongoing,
+        deadline: deadline,
         wishId: newWish.id,
       })
       .returning({id: entry.id});
@@ -94,8 +95,8 @@ const useNewWishViewModel = () => {
     setDescription,
     price,
     setPrice,
-    dueDate,
-    setDueDate,
+    deadline,
+    setDeadline,
     isDatePickerOpen,
     setDatePickerOpen,
     links,

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e164cb12-2f0a-4e06-b387-f04872d31118",
+  "id": "a5c9345f-b22b-475d-a855-c293d0ffe821",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "collection": {
@@ -80,8 +80,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "due_date": {
-          "name": "due_date",
+        "deadline": {
+          "name": "deadline",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -92,8 +92,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
-          "autoincrement": false,
-          "default": "(CURRENT_DATE)"
+          "autoincrement": false
         },
         "end_date": {
           "name": "end_date",

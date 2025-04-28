@@ -7,6 +7,7 @@ import style from './style';
 import WishItem from '../../components/WishItem/WishItem';
 import useGlobalStyle from '../../components/globalStyle';
 import useHomeViewModel from './HomeViewModel';
+import {WishState} from '../../contexts/DrawerContext';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -39,6 +40,16 @@ const HomeScreen = () => {
                 fullWish={item}
                 onDeleteWish={async () => {
                   await viewModel.deleteWish(item.wish.id);
+                }}
+                onUpdateWishState={async () => {
+                  const newState =
+                    item.entries[0].entry.state === WishState.ongoing
+                      ? WishState.done
+                      : WishState.ongoing;
+                  await viewModel.updateWishState(
+                    item.entries[0].entry.id,
+                    newState,
+                  );
                 }}
               />
             )}

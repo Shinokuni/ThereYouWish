@@ -1,6 +1,10 @@
-import {sql} from 'drizzle-orm';
-import {sqliteTable, integer, text, real} from 'drizzle-orm/sqlite-core';
-import {WishState} from '../contexts/DrawerContext';
+import {
+  sqliteTable,
+  integer,
+  text,
+  real,
+} from 'drizzle-orm/sqlite-core';
+import {dateType, wishStateType} from './customTypes';
 
 export const collection = sqliteTable('collection', {
   id: integer().primaryKey({autoIncrement: true}),
@@ -28,12 +32,12 @@ export const entry = sqliteTable('entry', {
   name: text().notNull(),
   description: text(),
   price: real(),
-  state: text().notNull().$type<WishState>(),
-  dueDate: text('due_date'),
-  startDate: text('start_date')
+  state: wishStateType().notNull(),
+  deadline: dateType('deadline'),
+  startDate: dateType('start_date')
     .notNull()
-    .default(sql`(CURRENT_DATE)`),
-  endDate: text('end_date'),
+    .$defaultFn(() => new Date()),
+  endDate: dateType('end_date'),
   wishId: integer('wish_id')
     .references(() => wish.id, {onDelete: 'cascade'})
     .notNull(),

@@ -4,7 +4,7 @@ import {useSQLiteContext} from 'expo-sqlite';
 import {FullEntry, FullWish} from '../../components/WishItem/WishItem';
 import {entry, image, link, tag, tagJoin, wish} from '../../db/schema';
 import {eq, and} from 'drizzle-orm';
-import useDrawerContext from '../../contexts/DrawerContext';
+import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 
 const useHomeViewModel = () => {
   const expo = useSQLiteContext();
@@ -17,6 +17,13 @@ const useHomeViewModel = () => {
   const deleteWish = async (wishId: number) => {
     console.log(wishId);
     await database.delete(wish).where(eq(wish.id, wishId));
+  };
+
+  const updateWishState = async (entryId: number, state: WishState) => {
+    await database
+      .update(entry)
+      .set({state: state})
+      .where(eq(entry.id, entryId));
   };
 
   const {data} = useLiveQuery(
@@ -84,6 +91,7 @@ const useHomeViewModel = () => {
     isLoading,
     wishes,
     deleteWish,
+    updateWishState,
   };
 };
 

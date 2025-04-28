@@ -162,7 +162,7 @@ const NewWishScreen = () => {
                   viewModel.setDatePickerOpen(true);
                 }}>
                 <TextInput
-                  value={viewModel.dueDate?.toLocaleDateString(
+                  value={viewModel.deadline?.toLocaleDateString(
                     locale.languageCode,
                   )}
                   editable={false}
@@ -193,7 +193,7 @@ const NewWishScreen = () => {
                 date={new Date()}
                 onConfirm={date => {
                   viewModel.setDatePickerOpen(false);
-                  viewModel.setDueDate(date);
+                  viewModel.setDeadline(date);
                 }}
                 onCancel={() => {
                   viewModel.setDatePickerOpen(false);

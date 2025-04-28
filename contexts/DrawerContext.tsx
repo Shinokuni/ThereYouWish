@@ -2,8 +2,8 @@ import React, {useContext} from 'react';
 import {createContext, useState} from 'react';
 
 export enum WishState {
-  ongoing,
-  done,
+  ongoing = 'ongoing',
+  done = 'done',
 }
 
 export interface DrawerState {
@@ -26,7 +26,8 @@ const DrawerContextProvider = ({children}: any) => {
   });
 
   return (
-    <DrawerContext.Provider value={{drawerState: drawerState, setState: setDrawerState}}>
+    <DrawerContext.Provider
+      value={{drawerState: drawerState, setState: setDrawerState}}>
       {children}
     </DrawerContext.Provider>
   );

@@ -11,8 +11,8 @@ CREATE TABLE `entry` (
 	`description` text,
 	`price` real,
 	`state` text NOT NULL,
-	`due_date` text,
-	`start_date` text DEFAULT (CURRENT_DATE) NOT NULL,
+	`deadline` text,
+	`start_date` text NOT NULL,
 	`end_date` text,
 	`wish_id` integer NOT NULL,
 	FOREIGN KEY (`wish_id`) REFERENCES `wish`(`id`) ON UPDATE no action ON DELETE cascade

@@ -42,9 +42,8 @@ const style = StyleSheet.create({
     marginEnd: 8,
   },
   iconContainer: {
+    flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
   },
   link: {
     margin: 0,
@@ -52,6 +51,18 @@ const style = StyleSheet.create({
   },
   actions: {
     margin: 0,
+  },
+  leftIconContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  rightIconContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
   },
 });
 
