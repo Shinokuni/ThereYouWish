@@ -39,7 +39,9 @@ const App = () => {
   return (
     <GestureHandlerRootView>
       <DrawerContextProvider>
-        <SQLiteProvider databaseName={'thereyouwish.db'}>
+        <SQLiteProvider
+          databaseName={'thereyouwish.db'}
+          options={{enableChangeListener: true}}>
           <Navigation />
         </SQLiteProvider>
       </DrawerContextProvider>

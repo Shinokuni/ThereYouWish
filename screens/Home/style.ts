@@ -10,6 +10,11 @@ const style = StyleSheet.create({
   list: {
     margin: 8,
   },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default style;

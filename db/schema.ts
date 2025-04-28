@@ -20,8 +20,8 @@ export const wish = sqliteTable('wish', {
     .notNull(),
 });
 
-export type Wish = typeof collection.$inferSelect;
-export type WishInsert = typeof collection.$inferInsert;
+export type Wish = typeof wish.$inferSelect;
+export type WishInsert = typeof wish.$inferInsert;
 
 export const entry = sqliteTable('entry', {
   id: integer().primaryKey({autoIncrement: true}),

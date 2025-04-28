@@ -1,60 +1,18 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React from 'react';
 import {FlatList, SafeAreaView, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Appbar, FAB} from 'react-native-paper';
-import {useSQLiteContext} from 'expo-sqlite';
-import {drizzle} from 'drizzle-orm/expo-sqlite';
+import {ActivityIndicator, Appbar, FAB, Text} from 'react-native-paper';
 
 import style from './style';
-import WishItem, {FullEntry} from '../../components/WishItem/WishItem';
+import WishItem from '../../components/WishItem/WishItem';
 import useGlobalStyle from '../../components/globalStyle';
-import {eq} from 'drizzle-orm';
-import {entry, image, link, tag, tagJoin} from '../../db/schema';
+import useHomeViewModel from './HomeViewModel';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const expo = useSQLiteContext();
-  const database = useMemo(() => drizzle(expo), [expo]);
   const globalStyle = useGlobalStyle();
 
-  const [entries, setEntries] = useState<FullEntry[]>([]);
-
-  useEffect(() => {
-    const loadWishes = async () => {
-      const dbEntries = await database.select().from(entry);
-
-      const fullEntries: FullEntry[] = [];
-
-      for (const dbEntry of dbEntries) {
-        const tags = await database
-          .select({id: tag.id, name: tag.name})
-          .from(tag)
-          .innerJoin(tagJoin, eq(tag.id, tagJoin.tagId))
-          .where(eq(tagJoin.entryId, dbEntry.id));
-
-        const links = await database
-          .select()
-          .from(link)
-          .where(eq(link.entryId, dbEntry.id));
-
-        const images = await database
-          .select()
-          .from(image)
-          .where(eq(image.entryId, dbEntry.id));
-
-        fullEntries.push({
-          entry: dbEntry,
-          tags: tags,
-          links: links,
-          images: images,
-        });
-      }
-
-      setEntries(fullEntries);
-    };
-
-    loadWishes();
-  }, [database, setEntries]);
+  const viewModel = useHomeViewModel();
 
   return (
     <SafeAreaView style={globalStyle.screenContainer}>
@@ -68,13 +26,30 @@ const HomeScreen = () => {
         <Appbar.Content title="Wishes" />
       </Appbar.Header>
 
-      <View style={style.list}>
-        <FlatList
-          data={entries}
-          renderItem={({item}) => <WishItem fullEntry={item} />}
-          keyExtractor={item => item.entry.id.toString()}
-        />
-      </View>
+      {viewModel.isLoading ? (
+        <View style={style.centerContainer}>
+          <ActivityIndicator size={'large'} />
+        </View>
+      ) : viewModel.wishes.length > 0 ? (
+        <View style={style.list}>
+          <FlatList
+            data={viewModel.wishes}
+            renderItem={({item}) => (
+              <WishItem
+                fullWish={item}
+                onDeleteWish={async () => {
+                  await viewModel.deleteWish(item.wish.id);
+                }}
+              />
+            )}
+            keyExtractor={item => item.wish.id.toString()}
+          />
+        </View>
+      ) : (
+        <View style={style.centerContainer}>
+          <Text variant={'headlineMedium'}>No wish</Text>
+        </View>
+      )}
 
       <FAB
         style={style.fab}

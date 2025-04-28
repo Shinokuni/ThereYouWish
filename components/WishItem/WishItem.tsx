@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Entry, Image, Link, Tag} from '../../db/schema';
+import {Entry, Image, Link, Tag, Wish} from '../../db/schema';
 import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
 import style from './style';
 import {FlatList, Linking, View} from 'react-native';
@@ -20,8 +20,14 @@ const formatPrice = (price: number) => {
 };
 
 type WishItemProps = {
-  fullEntry: FullEntry;
+  fullWish: FullWish;
+  onDeleteWish: () => void;
 };
+
+export interface FullWish {
+  wish: Wish;
+  entries: FullEntry[];
+}
 
 export interface FullEntry {
   entry: Entry;
@@ -30,11 +36,12 @@ export interface FullEntry {
   images: Image[];
 }
 
-const WishItem = ({fullEntry}: WishItemProps) => {
-  const entry = fullEntry.entry;
+const WishItem = ({fullWish, onDeleteWish}: WishItemProps) => {
+  const [fullEntry] = fullWish.entries;
   const tags = fullEntry.tags;
   const links = fullEntry.links;
   const images = fullEntry.images;
+  const entry = fullEntry.entry;
 
   const theme = useTheme();
 
@@ -64,16 +71,17 @@ const WishItem = ({fullEntry}: WishItemProps) => {
         </Text>
       )}
 
-      <View style={style.tagContainer}>
-        {tags.length > 0 &&
-          tags.map(tag => {
+      {tags.length > 0 && (
+        <View style={style.tagContainer}>
+          {tags.map(tag => {
             return (
               <Chip key={tag.id} style={style.tag}>
                 {tag.name}
               </Chip>
             );
           })}
-      </View>
+        </View>
+      )}
 
       {images.length > 0 && (
         <FlatList
@@ -125,7 +133,9 @@ const WishItem = ({fullEntry}: WishItemProps) => {
             },
             {
               name: 'Delete',
-              onClick: () => {},
+              onClick: () => {
+                onDeleteWish();
+              },
             },
           ]}
           style={style.actions}
