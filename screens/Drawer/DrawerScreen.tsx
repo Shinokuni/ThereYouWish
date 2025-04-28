@@ -1,13 +1,10 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React from 'react';
 import {Drawer} from 'react-native-paper';
 import {DrawerContentScrollView} from '@react-navigation/drawer';
-import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
-import {useSQLiteContext} from 'expo-sqlite';
-import {drizzle} from 'drizzle-orm/expo-sqlite';
 
-import * as schema from '../../db/schema';
-import {Collection, Tag} from '../../db/schema';
+import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import DropdownMenu, {Action} from '../../components/DropdownMenu/DropdownMenu';
+import useDrawerViewModel from './DrawerViewModel';
 
 const DrawerMenu = (actions: Action[]) => {
   return <DropdownMenu actions={actions} />;
@@ -15,23 +12,7 @@ const DrawerMenu = (actions: Action[]) => {
 
 const DrawerScreen = () => {
   const drawerContext = useDrawerContext();
-  const expo = useSQLiteContext();
-  const database = useMemo(() => drizzle(expo, {schema}), [expo]);
-
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      const loaded = await database.select().from(schema.collection);
-      setCollections(loaded);
-
-      const loadedTags = await database.select().from(schema.tag);
-      setTags(loadedTags);
-    };
-
-    loadData();
-  }, [database, setCollections, setTags]);
+  const viewModel = useDrawerViewModel();
 
   return (
     <DrawerContentScrollView>
@@ -63,8 +44,8 @@ const DrawerScreen = () => {
       </Drawer.Section>
 
       <Drawer.Section title="Collections">
-        {collections.length > 0 &&
-          collections.map(collection => (
+        {viewModel.collections.length > 0 &&
+          viewModel.collections.map(collection => (
             <Drawer.Item
               key={collection.id}
               label={collection.name}
@@ -78,7 +59,9 @@ const DrawerScreen = () => {
                   },
                   {
                     name: 'Delete',
-                    onClick: () => {},
+                    onClick: async () => {
+                      await viewModel.deleteCollection(collection.id);
+                    },
                   },
                 ])
               }
@@ -93,8 +76,8 @@ const DrawerScreen = () => {
       </Drawer.Section>
 
       <Drawer.Section title="Tags" showDivider={false}>
-        {tags.length > 0 &&
-          tags.map(tag => (
+        {viewModel.tags.length > 0 &&
+          viewModel.tags.map(tag => (
             <Drawer.Item
               key={tag.id}
               label={tag.name}
@@ -114,7 +97,9 @@ const DrawerScreen = () => {
                   },
                   {
                     name: 'Delete',
-                    onClick: () => {},
+                    onClick: async () => {
+                      await viewModel.deleteTag(tag.id);
+                    },
                   },
                 ])
               }

@@ -51,7 +51,7 @@ const WishItem = ({fullWish, onDeleteWish}: WishItemProps) => {
         <Text variant={'headlineSmall'} numberOfLines={1} style={style.name}>
           {entry.name}
         </Text>
-        {entry.price !== null && (
+        {entry.price && (
           <View
             style={{
               ...style.priceContainer,
@@ -65,7 +65,7 @@ const WishItem = ({fullWish, onDeleteWish}: WishItemProps) => {
           </View>
         )}
       </View>
-      {entry.description !== null && (
+      {entry.description && (
         <Text variant={'bodyLarge'} style={style.description}>
           {entry.description}
         </Text>

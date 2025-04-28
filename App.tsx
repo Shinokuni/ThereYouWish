@@ -24,13 +24,6 @@ const App = () => {
           .insert(collection)
           .values({name: 'Default collection', current: true});
       }
-
-      const tagCount = await db.$count(tag);
-      if (tagCount === 0) {
-        await db
-          .insert(tag)
-          .values([{name: 'Tag 1'}, {name: 'Tag 2'}, {name: 'Tag 3'}]);
-      }
     };
 
     preloadDb();
