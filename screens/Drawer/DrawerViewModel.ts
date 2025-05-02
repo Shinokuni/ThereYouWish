@@ -1,7 +1,7 @@
 import {useSQLiteContext} from 'expo-sqlite';
 import {useCallback, useEffect, useMemo} from 'react';
 import {drizzle, useLiveQuery} from 'drizzle-orm/expo-sqlite';
-import {collection, tag} from '../../db/schema';
+import {collection, tag, tagJoin} from '../../db/schema';
 import {eq} from 'drizzle-orm';
 import useDrawerContext from '../../contexts/DrawerContext';
 
@@ -14,6 +14,7 @@ const useDrawerViewModel = () => {
   const tags = useLiveQuery(database.select().from(tag)).data;
 
   const deleteTag = async (tagId: number) => {
+    await database.delete(tagJoin).where(eq(tagJoin.tagId, tagId));
     await database.delete(tag).where(eq(tag.id, tagId));
   };
 

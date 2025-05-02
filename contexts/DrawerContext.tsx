@@ -10,7 +10,7 @@ export enum WishState {
 export interface DrawerState {
   wishState: WishState;
   collectionId: number;
-  tagId?: number;
+  tagId: number;
 }
 
 export type DrawerStateContextType = {
@@ -24,6 +24,7 @@ const DrawerContextProvider = ({children}: any) => {
   const [drawerState, setDrawerState] = useState<DrawerState>({
     wishState: WishState.all,
     collectionId: -1,
+    tagId: -1,
   });
 
   return (

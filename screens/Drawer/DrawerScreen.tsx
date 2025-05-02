@@ -25,6 +25,7 @@ const DrawerScreen = () => {
             drawerContext?.setState({
               ...drawerContext.drawerState,
               wishState: WishState.all,
+              tagId: -1,
             });
           }}
         />
@@ -36,6 +37,7 @@ const DrawerScreen = () => {
             drawerContext?.setState({
               ...drawerContext.drawerState,
               wishState: WishState.ongoing,
+              tagId: -1,
             });
           }}
         />
@@ -48,6 +50,7 @@ const DrawerScreen = () => {
               drawerContext.setState({
                 ...drawerContext.drawerState,
                 wishState: WishState.done,
+                tagId: -1,
               });
             }
           }}

@@ -24,7 +24,7 @@ const useHomeViewModel = () => {
 
   const {data} = useLiveQuery(
     database
-      .select({
+      .selectDistinct({
         id: wish.id,
         name: wish.name,
         state: wish.state,
@@ -32,16 +32,22 @@ const useHomeViewModel = () => {
       })
       .from(wish)
       .innerJoin(entry, eq(wish.id, entry.wishId))
+      .leftJoin(tagJoin, eq(tagJoin.entryId, entry.id))
       .where(
         and(
           eq(wish.collectionId, drawerContext!!.drawerState.collectionId),
           drawerContext!!.drawerState.wishState !== WishState.all
             ? eq(wish.state, drawerContext!!.drawerState.wishState)
             : undefined,
+          drawerContext!!.drawerState.tagId !== -1
+            ? eq(tagJoin.tagId, drawerContext!!.drawerState.tagId)
+            : undefined,
         ),
       ),
     [drawerContext!!.drawerState],
   );
+
+  const allTags = useLiveQuery(database.select().from(tag)).data;
 
   useEffect(() => {
     const loadFullWishes = async () => {
@@ -88,7 +94,7 @@ const useHomeViewModel = () => {
     };
 
     loadFullWishes();
-  }, [data, database]);
+  }, [data, allTags, database]);
 
   return {
     isLoading,
