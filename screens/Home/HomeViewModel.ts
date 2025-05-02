@@ -34,7 +34,9 @@ const useHomeViewModel = () => {
       .where(
         and(
           eq(wish.collectionId, drawerContext!!.drawerState.collectionId),
-          eq(entry.state, drawerContext!!.drawerState.wishState),
+          drawerContext!!.drawerState.wishState !== WishState.all
+            ? eq(entry.state, drawerContext!!.drawerState.wishState)
+            : undefined,
         ),
       ),
     [drawerContext!!.drawerState],

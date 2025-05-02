@@ -4,6 +4,7 @@ import {createContext, useState} from 'react';
 export enum WishState {
   ongoing = 'ongoing',
   done = 'done',
+  all = 'all',
 }
 
 export interface DrawerState {
@@ -21,7 +22,7 @@ const DrawerContext = createContext<DrawerStateContextType | null>(null);
 
 const DrawerContextProvider = ({children}: any) => {
   const [drawerState, setDrawerState] = useState<DrawerState>({
-    wishState: WishState.ongoing,
+    wishState: WishState.all,
     collectionId: -1,
   });
 

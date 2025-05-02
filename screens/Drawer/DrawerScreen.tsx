@@ -18,6 +18,17 @@ const DrawerScreen = () => {
     <DrawerContentScrollView>
       <Drawer.Section title="Status">
         <Drawer.Item
+          label="All"
+          icon={'apps'}
+          active={drawerContext?.drawerState.wishState === WishState.all}
+          onPress={() => {
+            drawerContext?.setState({
+              ...drawerContext.drawerState,
+              wishState: WishState.all,
+            });
+          }}
+        />
+        <Drawer.Item
           label="On going"
           icon={'refresh'}
           active={drawerContext?.drawerState.wishState === WishState.ongoing}
