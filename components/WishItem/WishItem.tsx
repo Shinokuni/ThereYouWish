@@ -122,7 +122,7 @@ const WishItem = ({
 
         <View style={style.rightIconContainer}>
           <IconButton
-            icon={entry.state === WishState.ongoing ? 'check' : 'refresh'}
+            icon={fullWish.wish.state === WishState.ongoing ? 'check' : 'refresh'}
             style={style.actions}
             onPress={() => {
               onUpdateWishState();

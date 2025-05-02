@@ -1,9 +1,4 @@
-import {
-  sqliteTable,
-  integer,
-  text,
-  real,
-} from 'drizzle-orm/sqlite-core';
+import {sqliteTable, integer, text, real} from 'drizzle-orm/sqlite-core';
 import {dateType, wishStateType} from './customTypes';
 
 export const collection = sqliteTable('collection', {
@@ -19,6 +14,7 @@ export type CollectionInsert = typeof collection.$inferInsert;
 export const wish = sqliteTable('wish', {
   id: integer().primaryKey({autoIncrement: true}),
   name: text(),
+  state: wishStateType().notNull(),
   collectionId: integer('collection_id')
     .references(() => collection.id, {onDelete: 'cascade'})
     .notNull(),

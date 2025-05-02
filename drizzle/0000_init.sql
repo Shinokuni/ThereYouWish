@@ -48,6 +48,7 @@ CREATE TABLE `tag_join` (
 CREATE TABLE `wish` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text,
+	`state` text NOT NULL,
 	`collection_id` integer NOT NULL,
 	FOREIGN KEY (`collection_id`) REFERENCES `collection`(`id`) ON UPDATE no action ON DELETE cascade
 );

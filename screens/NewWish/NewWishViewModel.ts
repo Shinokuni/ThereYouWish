@@ -53,6 +53,7 @@ const useNewWishViewModel = () => {
       .insert(wish)
       .values({
         name: title,
+        state: WishState.ongoing,
         collectionId: drawerContext!!.drawerState.collectionId,
       })
       .returning({id: wish.id});

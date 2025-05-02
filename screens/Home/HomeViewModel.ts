@@ -15,27 +15,28 @@ const useHomeViewModel = () => {
   const [wishes, setWishes] = useState<FullWish[]>([]);
 
   const deleteWish = async (wishId: number) => {
-    console.log(wishId);
     await database.delete(wish).where(eq(wish.id, wishId));
   };
 
-  const updateWishState = async (entryId: number, state: WishState) => {
-    await database
-      .update(entry)
-      .set({state: state})
-      .where(eq(entry.id, entryId));
+  const updateWishState = async (wishId: number, state: WishState) => {
+    await database.update(wish).set({state: state}).where(eq(wish.id, wishId));
   };
 
   const {data} = useLiveQuery(
     database
-      .select({id: wish.id, name: wish.name, collectionId: wish.collectionId})
+      .select({
+        id: wish.id,
+        name: wish.name,
+        state: wish.state,
+        collectionId: wish.collectionId,
+      })
       .from(wish)
       .innerJoin(entry, eq(wish.id, entry.wishId))
       .where(
         and(
           eq(wish.collectionId, drawerContext!!.drawerState.collectionId),
           drawerContext!!.drawerState.wishState !== WishState.all
-            ? eq(entry.state, drawerContext!!.drawerState.wishState)
+            ? eq(wish.state, drawerContext!!.drawerState.wishState)
             : undefined,
         ),
       ),

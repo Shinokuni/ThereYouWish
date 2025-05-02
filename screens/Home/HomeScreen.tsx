@@ -43,13 +43,10 @@ const HomeScreen = () => {
                 }}
                 onUpdateWishState={async () => {
                   const newState =
-                    item.entries[0].entry.state === WishState.ongoing
+                    item.wish.state === WishState.ongoing
                       ? WishState.done
                       : WishState.ongoing;
-                  await viewModel.updateWishState(
-                    item.entries[0].entry.id,
-                    newState,
-                  );
+                  await viewModel.updateWishState(item.wish.id, newState);
                 }}
               />
             )}

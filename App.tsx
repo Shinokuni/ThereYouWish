@@ -1,11 +1,11 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import Navigation from './navigation/Navigation';
 import {openDatabaseSync, SQLiteDatabase, SQLiteProvider} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
 import {useMigrations} from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from './drizzle/migrations';
 import {DrawerContextProvider} from './contexts/DrawerContext';
-import {collection, tag} from './db/schema';
+import {collection} from './db/schema';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const App = () => {
