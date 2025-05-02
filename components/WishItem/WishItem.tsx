@@ -52,9 +52,6 @@ const WishItem = ({
 
   const theme = useTheme();
 
-  console.log(entry.state);
-  console.log(entry.state === WishState.ongoing);
-
   return (
     <Card style={{...style.container}}>
       <View style={style.header}>
