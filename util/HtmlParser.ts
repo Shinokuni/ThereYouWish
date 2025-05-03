@@ -31,26 +31,24 @@ class HtmlParser {
 
   private parseTitle(head: Element): string | undefined {
     const element = CSSSelect.selectOne(
-      'title,meta[property="og:title"],meta[name="twitter:title"]',
+      'title,meta[name="title"],meta[property="og:title"],meta[name="twitter:title"]',
       head,
     );
 
     if (element?.name === 'title') {
       return DomUtils.innerText(element.firstChild!!);
     } else {
-      console.log(element);
-
-      element?.attribs.content;
+      return element?.attribs.content.trim();
     }
   }
 
   private parseDescription(head: Element): string | undefined {
     const element = CSSSelect.selectOne(
-      'meta[property="og:description"],meta[name="twitter:description"]',
+      'meta[name="description"],meta[property="og:description"],meta[name="twitter:description"]',
       head,
     );
 
-    return element?.attribs.content;
+    return element?.attribs.content.trim();
   }
 
   private parseUrl(head: Element): string | undefined {
@@ -77,7 +75,7 @@ class HtmlParser {
 
   private parseImageUrl(head: Element): string | undefined {
     const element = CSSSelect.selectOne(
-      'meta[property="og:image:secure_url"],meta[name="twitter:image"]',
+      'meta[property="og:image"],meta[property="og:image:secure_url"],meta[name="twitter:image"]',
       head,
     );
 
