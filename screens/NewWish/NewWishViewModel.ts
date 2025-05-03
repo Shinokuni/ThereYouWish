@@ -74,21 +74,30 @@ const useNewWishViewModel = () => {
       })
       .returning({id: entry.id});
 
-    await database
-      .insert(tagJoin)
-      .values(
-        selectedTagIds.map(value => ({entryId: newEntry.id, tagId: value})),
-      );
+    if (selectedTagIds.length > 0) {
+      await database
+        .insert(tagJoin)
+        .values(
+          selectedTagIds.map(value => ({entryId: newEntry.id, tagId: value})),
+        );
+    }
 
-    await database
-      .insert(link)
-      .values(
-        links.map(newLink => ({url: newLink.toString(), entryId: newEntry.id})),
+    if (links.length > 0) {
+      await database.insert(link).values(
+        links.map(newLink => ({
+          url: newLink.toString(),
+          entryId: newEntry.id,
+        })),
       );
+    }
 
-    await database
-      .insert(image)
-      .values(images.map(newImage => ({url: newImage, entryId: newEntry.id})));
+    if (images.length > 0) {
+      await database
+        .insert(image)
+        .values(
+          images.map(newImage => ({url: newImage, entryId: newEntry.id})),
+        );
+    }
   };
 
   const parseLink = async (newLink: string) => {
