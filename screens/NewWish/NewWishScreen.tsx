@@ -29,6 +29,7 @@ import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import WishLinks from '../../components/WishLinks/WishLinks';
 import WishImages from '../../components/WishImages/WishImages';
 import useNewWishViewModel from './NewWishViewModel';
+import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 
 const NewWishScreen = () => {
   const navigation = useNavigation();
@@ -54,6 +55,12 @@ const NewWishScreen = () => {
           }}
         />
         <Appbar.Content title="New wish" />
+        <Appbar.Action
+          icon={'link-plus'}
+          onPress={() => {
+            viewModel.setLinkDialogVisible(true);
+          }}
+        />
       </Appbar.Header>
 
       <KeyboardAvoidingView behavior="padding">
@@ -311,6 +318,22 @@ const NewWishScreen = () => {
           } else {
             viewModel.setSelectedTagIds([...viewModel.selectedTagIds, id]);
           }
+        }}
+      />
+
+      <TextInputDialog
+        title={'Generate infos from link'}
+        value={viewModel.linkDialogValue}
+        visible={viewModel.isLinkDialogVisible}
+        onValueChange={viewModel.setLinkDialogValue}
+        onValidate={async () => {
+          viewModel.setLinkDialogVisible(false);
+          await viewModel.parseLink(viewModel.linkDialogValue);
+          viewModel.setLinkDialogValue('');
+        }}
+        onDismiss={() => {
+          viewModel.setLinkDialogVisible(false);
+          viewModel.setLinkDialogValue('');
         }}
       />
     </SafeAreaView>

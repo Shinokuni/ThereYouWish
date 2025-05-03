@@ -3,6 +3,7 @@ import {entry, image, link, tag, Tag, tagJoin, wish} from '../../db/schema';
 import {useSQLiteContext} from 'expo-sqlite';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
+import HtmlParser from '../../util/HtmlParser';
 
 const useNewWishViewModel = () => {
   const expo = useSQLiteContext();
@@ -24,6 +25,9 @@ const useNewWishViewModel = () => {
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
   const [images, setImages] = useState<string[]>([]);
+
+  const [isLinkDialogVisible, setLinkDialogVisible] = useState(false);
+  const [linkDialogValue, setLinkDialogValue] = useState('');
 
   const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
@@ -87,6 +91,25 @@ const useNewWishViewModel = () => {
       .values(images.map(newImage => ({url: newImage, entryId: newEntry.id})));
   };
 
+  const parseLink = async (newLink: string) => {
+    const response = await fetch(newLink);
+    const text = await response.text();
+
+    const result = new HtmlParser().parse(text);
+
+    setTitle(result.title ? result.title : '');
+    setDescription(result.description ? result.description : '');
+    setPrice(result.price ? result.price : '');
+
+    if (result.url) {
+      setLinks([...links, new URL(result.url)]);
+    }
+
+    if (result.imageUrl) {
+      setImages([...images, result.imageUrl]);
+    }
+  };
+
   return {
     title,
     setTitle,
@@ -115,6 +138,11 @@ const useNewWishViewModel = () => {
     addNewTag,
     checkFields,
     insertWish,
+    isLinkDialogVisible,
+    setLinkDialogVisible,
+    linkDialogValue,
+    setLinkDialogValue,
+    parseLink,
   };
 };
 
