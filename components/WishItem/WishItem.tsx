@@ -23,6 +23,7 @@ const formatPrice = (price: number) => {
 
 type WishItemProps = {
   fullWish: FullWish;
+  onEditWish: () => void;
   onDeleteWish: () => void;
   onUpdateWishState: () => void;
 };
@@ -41,6 +42,7 @@ export interface FullEntry {
 
 const WishItem = ({
   fullWish,
+  onEditWish,
   onDeleteWish,
   onUpdateWishState,
 }: WishItemProps) => {
@@ -55,7 +57,7 @@ const WishItem = ({
   return (
     <Card style={{...style.container}}>
       <View style={style.header}>
-        <Text variant={'headlineSmall'} numberOfLines={1} style={style.name}>
+        <Text variant={'headlineSmall'} numberOfLines={2} style={style.name}>
           {entry.name}
         </Text>
         {entry.price && (
@@ -122,7 +124,9 @@ const WishItem = ({
 
         <View style={style.rightIconContainer}>
           <IconButton
-            icon={fullWish.wish.state === WishState.ongoing ? 'check' : 'refresh'}
+            icon={
+              fullWish.wish.state === WishState.ongoing ? 'check' : 'refresh'
+            }
             style={style.actions}
             onPress={() => {
               onUpdateWishState();
@@ -134,15 +138,15 @@ const WishItem = ({
                 icon={'open-in-new'}
                 style={style.link}
                 onPress={() => {
-                  Linking.openURL(links[0].url);
+                  Linking.openURL(links[0].url.toString());
                 }}
               />
             ) : (
               <DropdownMenu
                 actions={links.map(value => ({
-                  name: new URL(value.url).host,
+                  name: value.url.host,
                   onClick: () => {
-                    Linking.openURL(value.url);
+                    Linking.openURL(value.url.toString());
                   },
                 }))}
                 icon={'open-in-new'}
@@ -165,7 +169,9 @@ const WishItem = ({
             actions={[
               {
                 name: 'Edit',
-                onClick: () => {},
+                onClick: () => {
+                  onEditWish();
+                },
               },
               {
                 name: 'Delete',

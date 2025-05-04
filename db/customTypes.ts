@@ -28,3 +28,17 @@ export const wishStateType = customType<{data: WishState; driverData: string}>({
     return value.toString();
   },
 });
+
+export const urlType = customType<{data: URL; driverData: string}>({
+  dataType() {
+    return 'text';
+  },
+
+  fromDriver(value: string): URL {
+    return new URL(value);
+  },
+
+  toDriver(value: URL): string {
+    return value.toString();
+  },
+});

@@ -1,7 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../screens/Home/HomeScreen';
 import NewWishScreen from '../screens/NewWish/NewWishScreen';
-import {createStaticNavigation} from '@react-navigation/native';
+import {createStaticNavigation, StaticParamList} from '@react-navigation/native';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import DrawerScreen from '../screens/Drawer/DrawerScreen';
 
@@ -25,6 +25,14 @@ const RootStack = createNativeStackNavigator({
     NewWish: NewWishScreen,
   },
 });
+
+type RootStackParamList = StaticParamList<typeof RootStack>;
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
+}
 
 const Navigation = createStaticNavigation(RootStack);
 

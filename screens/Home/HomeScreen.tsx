@@ -38,6 +38,9 @@ const HomeScreen = () => {
             renderItem={({item}) => (
               <WishItem
                 fullWish={item}
+                onEditWish={() => {
+                  navigation.navigate('NewWish', {fullWish: item});
+                }}
                 onDeleteWish={async () => {
                   await viewModel.deleteWish(item.wish.id);
                 }}
@@ -62,7 +65,7 @@ const HomeScreen = () => {
       <FAB
         style={style.fab}
         icon={'plus'}
-        onPress={() => navigation.navigate('NewWish')}
+        onPress={() => navigation.navigate('NewWish', {})}
       />
     </SafeAreaView>
   );

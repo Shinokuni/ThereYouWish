@@ -1,5 +1,5 @@
 import {sqliteTable, integer, text, real} from 'drizzle-orm/sqlite-core';
-import {dateType, wishStateType} from './customTypes';
+import {dateType, urlType, wishStateType} from './customTypes';
 
 export const collection = sqliteTable('collection', {
   id: integer().primaryKey({autoIncrement: true}),
@@ -44,7 +44,7 @@ export type EntrySelect = typeof entry.$inferInsert;
 
 export const link = sqliteTable('link', {
   id: integer().primaryKey({autoIncrement: true}),
-  url: text().notNull(),
+  url: urlType().notNull(),
   entryId: integer('entry_id')
     .references(() => entry.id, {onDelete: 'cascade'})
     .notNull(),

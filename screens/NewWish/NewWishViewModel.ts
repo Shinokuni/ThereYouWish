@@ -1,30 +1,63 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {entry, image, link, tag, Tag, tagJoin, wish} from '../../db/schema';
 import {useSQLiteContext} from 'expo-sqlite';
+import {and, eq, inArray} from 'drizzle-orm';
 import {drizzle} from 'drizzle-orm/expo-sqlite';
+
+import {entry, image, link, tag, Tag, tagJoin, wish} from '../../db/schema';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import HtmlParser from '../../util/HtmlParser';
+import {FullWish} from '../../components/WishItem/WishItem';
 
-const useNewWishViewModel = () => {
+type NewWishViewModelProps = {
+  fullWish?: FullWish;
+};
+
+const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
   const expo = useSQLiteContext();
   const database = useMemo(() => drizzle(expo), [expo]);
   const drawerContext = useDrawerContext();
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState(
+    fullWish?.entries[0].entry.name ? fullWish?.entries[0].entry.name : '',
+  );
   const [isTitleError, setTitleError] = useState(false);
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
-  const [deadline, setDeadline] = useState<Date | null>(null);
+  const [description, setDescription] = useState(
+    fullWish?.entries[0].entry.description
+      ? fullWish?.entries[0].entry.description
+      : '',
+  );
+  const [price, setPrice] = useState(
+    fullWish?.entries[0].entry.price
+      ? fullWish?.entries[0].entry.price.toString()
+      : '',
+  );
+  const [deadline, setDeadline] = useState<Date | null>(
+    fullWish?.entries[0].entry.deadline
+      ? fullWish?.entries[0].entry.deadline
+      : null,
+  );
   const [isDatePickerOpen, setDatePickerOpen] = useState(false);
 
-  const [links, setLinks] = useState<URL[]>([]);
+  const [links, setLinks] = useState<URL[]>(
+    fullWish?.entries[0].links
+      ? fullWish?.entries[0].links.map(value => value.url)
+      : [],
+  );
   const [linkValue, setLinkValue] = useState('');
   const [isLinkError, setIsLinkError] = useState(false);
 
   const [tags, setTags] = useState<Tag[]>([]);
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
+    fullWish?.entries[0].tags
+      ? fullWish?.entries[0].tags.map(value => value.id)!!
+      : [],
+  );
 
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>(
+    fullWish?.entries[0].images
+      ? fullWish?.entries[0].images.map(value => value.url)
+      : [],
+  );
 
   const [isLinkDialogVisible, setLinkDialogVisible] = useState(false);
   const [linkDialogValue, setLinkDialogValue] = useState('');
@@ -49,6 +82,93 @@ const useNewWishViewModel = () => {
     } else {
       setTitleError(true);
       return false;
+    }
+  };
+
+  const updateWish = async () => {
+    const entryId = fullWish?.entries[0].entry.id!!;
+    const baseLinks = fullWish?.entries[0].links;
+    const baseImages = fullWish?.entries[0].images;
+    const baseTags = fullWish?.entries[0].tags;
+
+    await database
+      .update(entry)
+      .set({
+        name: title,
+        description: description,
+        price: parseFloat(price),
+        deadline: deadline,
+      })
+      .where(eq(entry.id, entryId));
+
+    const linksToInsert = links.filter(
+      link => !baseLinks?.some(baseLink => baseLink.url === link),
+    );
+    const linksToDelete = baseLinks?.filter(
+      baseLink => !links.some(link => link === baseLink.url),
+    );
+
+    if (linksToInsert.length > 0) {
+      await database
+        .insert(link)
+        .values(linksToInsert.map(link => ({url: link, entryId: entryId})));
+    }
+
+    if (linksToDelete && linksToDelete.length > 0) {
+      await database.delete(link).where(
+        inArray(
+          link.id,
+          linksToDelete!!.map(value => value.id),
+        ),
+      );
+    }
+
+    const imagesToInsert = images.filter(
+      image => !baseImages?.some(baseImage => baseImage.url === image),
+    );
+    const imagesToDelete = baseImages?.filter(
+      baseImage => !images.some(image => image === baseImage.url),
+    );
+
+    if (imagesToInsert.length > 0) {
+      await database
+        .insert(image)
+        .values(imagesToInsert.map(image => ({url: image, entryId: entryId})));
+    }
+
+    if (imagesToDelete && imagesToDelete.length > 0) {
+      await database.delete(image).where(
+        inArray(
+          image.id,
+          imagesToDelete!!.map(value => value.id),
+        ),
+      );
+    }
+
+    const tagsToInsert = selectedTagIds.filter(
+      selectedTagId => !baseTags?.some(baseTag => baseTag.id === selectedTagId),
+    );
+    const tagsToDelete = baseTags?.filter(
+      baseTag =>
+        !selectedTagIds.some(selectedTagId => selectedTagId === baseTag.id),
+    );
+
+    if (tagsToInsert.length > 0) {
+      await database
+        .insert(tagJoin)
+        .values(tagsToInsert.map(tagId => ({tagId: tagId, entryId: entryId})));
+    }
+
+    if (tagsToDelete && tagsToDelete.length > 0) {
+      await database.delete(tagJoin).where(
+        and(
+          eq(tagJoin.entryId, entryId),
+          inArray(
+            tagJoin.tagId,
+            tagsToDelete.map(value => value.id),
+          ),
+        ),
+      );
     }
   };
 
@@ -85,7 +205,7 @@ const useNewWishViewModel = () => {
     if (links.length > 0) {
       await database.insert(link).values(
         links.map(newLink => ({
-          url: newLink.toString(),
+          url: newLink,
           entryId: newEntry.id,
         })),
       );
@@ -147,6 +267,7 @@ const useNewWishViewModel = () => {
     addNewTag,
     checkFields,
     insertWish,
+    updateWish,
     isLinkDialogVisible,
     setLinkDialogVisible,
     linkDialogValue,

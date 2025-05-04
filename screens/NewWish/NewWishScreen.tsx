@@ -7,7 +7,7 @@ import {
   TextInput as RNTextInput,
   KeyboardAvoidingView,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {StaticScreenProps, useNavigation} from '@react-navigation/native';
 import {
   Appbar,
   Button,
@@ -30,13 +30,20 @@ import WishLinks from '../../components/WishLinks/WishLinks';
 import WishImages from '../../components/WishImages/WishImages';
 import useNewWishViewModel from './NewWishViewModel';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
+import {FullWish} from '../../components/WishItem/WishItem';
 
-const NewWishScreen = () => {
+type NewWishScreenProps = StaticScreenProps<{
+  fullWish?: FullWish;
+}>;
+
+const NewWishScreen = ({route}: NewWishScreenProps) => {
   const navigation = useNavigation();
   const theme = useTheme();
   const globalStyle = useGlobalStyle();
 
-  const viewModel = useNewWishViewModel();
+  const viewModel = useNewWishViewModel({
+    fullWish: route.params ? route.params.fullWish : undefined,
+  });
 
   const [currency] = useMemo(() => getCurrencies(), []);
   const [locale] = useMemo(() => getLocales(), []);
@@ -247,11 +254,8 @@ const NewWishScreen = () => {
             <Surface style={style.tagSurface} mode="flat">
               <IconButton mode={'contained-tonal'} icon={'tag'} size={24} />
 
-              {viewModel.selectedTagIds.length === 0 ? (
-                <View style={style.tagMessage}>
-                  <Text>Add tag</Text>
-                </View>
-              ) : (
+              {viewModel.selectedTagIds.length > 0 &&
+              viewModel.tags.length > 0 ? (
                 <View style={style.tagList}>
                   {viewModel.selectedTagIds.map(id => {
                     const selectedTag = viewModel.tags.find(
@@ -264,6 +268,10 @@ const NewWishScreen = () => {
                       </Chip>
                     );
                   })}
+                </View>
+              ) : (
+                <View style={style.tagMessage}>
+                  <Text>Add tag</Text>
                 </View>
               )}
             </Surface>
@@ -294,11 +302,15 @@ const NewWishScreen = () => {
             style={style.validate}
             onPress={async () => {
               if (viewModel.checkFields()) {
-                viewModel.insertWish();
+                if (route.params) {
+                  await viewModel.updateWish();
+                } else {
+                  await viewModel.insertWish();
+                }
                 navigation.goBack();
               }
             }}>
-            Validate
+            {route.params ? 'Update' : 'Validate'}
           </Button>
         </ScrollView>
       </KeyboardAvoidingView>
