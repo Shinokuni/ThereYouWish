@@ -32,30 +32,30 @@ const HomeScreen = () => {
           <ActivityIndicator size={'large'} />
         </View>
       ) : viewModel.wishes.length > 0 ? (
-        <View style={style.list}>
-          <FlatList
-            data={viewModel.wishes}
-            renderItem={({item}) => (
-              <WishItem
-                fullWish={item}
-                onEditWish={() => {
-                  navigation.navigate('NewWish', {fullWish: item});
-                }}
-                onDeleteWish={async () => {
-                  await viewModel.deleteWish(item.wish.id);
-                }}
-                onUpdateWishState={async () => {
-                  const newState =
-                    item.wish.state === WishState.ongoing
-                      ? WishState.done
-                      : WishState.ongoing;
-                  await viewModel.updateWishState(item.wish.id, newState);
-                }}
-              />
-            )}
-            keyExtractor={item => item.wish.id.toString()}
-          />
-        </View>
+        <FlatList
+          data={viewModel.wishes}
+          style={style.list}
+          showsVerticalScrollIndicator={false}
+          renderItem={({item}) => (
+            <WishItem
+              fullWish={item}
+              onEditWish={() => {
+                navigation.navigate('NewWish', {fullWish: item});
+              }}
+              onDeleteWish={async () => {
+                await viewModel.deleteWish(item.wish.id);
+              }}
+              onUpdateWishState={async () => {
+                const newState =
+                  item.wish.state === WishState.ongoing
+                    ? WishState.done
+                    : WishState.ongoing;
+                await viewModel.updateWishState(item.wish.id, newState);
+              }}
+            />
+          )}
+          keyExtractor={item => item.wish.id.toString()}
+        />
       ) : (
         <View style={style.centerContainer}>
           <Text variant={'headlineMedium'}>No wish</Text>
