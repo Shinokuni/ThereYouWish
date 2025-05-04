@@ -75,10 +75,10 @@ export type TagInsert = typeof tag.$inferInsert;
 export const tagJoin = sqliteTable('tag_join', {
   id: integer().primaryKey({autoIncrement: true}),
   entryId: integer('entry_id')
-    .references(() => entry.id)
+    .references(() => entry.id, {onDelete: 'cascade'})
     .notNull(),
   tagId: integer('tag_id')
-    .references(() => tag.id)
+    .references(() => tag.id, {onDelete: 'cascade'})
     .notNull(),
 });
 

@@ -108,7 +108,8 @@ const DrawerScreen = () => {
                     },
                   ])
                 }
-                onPress={() => {
+                onPress={async () => {
+                  await viewModel.updateCurrentCollection(collection.id);
                   drawerContext?.setState({
                     ...drawerContext.drawerState,
                     collectionId: collection.id,

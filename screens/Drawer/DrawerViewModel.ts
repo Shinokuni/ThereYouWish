@@ -25,7 +25,6 @@ const useDrawerViewModel = () => {
   };
 
   const deleteTag = async (tagId: number) => {
-    await database.delete(tagJoin).where(eq(tagJoin.tagId, tagId));
     await database.delete(tag).where(eq(tag.id, tagId));
   };
 
@@ -38,6 +37,19 @@ const useDrawerViewModel = () => {
 
   const deleteCollection = async (collectionId: number) => {
     await database.delete(collection).where(eq(collection.id, collectionId));
+    const newCollections = collections.filter(
+      collection => collection.id !== collectionId,
+    );
+
+    if (newCollections.length > 0) {
+      await updateCurrentCollection(newCollections[0].id);
+    }
+  };
+
+  const updateCurrentCollection = async (collectionId: number) => {
+    await expo.execAsync(
+      `Update Collection Set current = Case When id = ${collectionId} Then 1 Else 0 End`,
+    );
   };
 
   const setCollectionId = useCallback(
@@ -52,8 +64,15 @@ const useDrawerViewModel = () => {
 
   useEffect(() => {
     if (collections.length > 0) {
-      const currentId = collections.find(value => value.current)!!.id;
-      setCollectionId(currentId);
+      const currentId = collections.find(value => value.current)?.id;
+
+      if (currentId) {
+        setCollectionId(currentId);
+      } else {
+        setCollectionId(-1);
+      }
+    } else {
+      setCollectionId(-1);
     }
   }, [collections]); // adding here setCollectionId creates endless re-rendering, I don't know why
 
@@ -72,6 +91,7 @@ const useDrawerViewModel = () => {
     renameTag,
     renameId,
     setRenameId,
+    updateCurrentCollection,
   };
 };
 

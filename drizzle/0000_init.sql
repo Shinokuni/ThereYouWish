@@ -41,8 +41,8 @@ CREATE TABLE `tag_join` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`entry_id` integer NOT NULL,
 	`tag_id` integer NOT NULL,
-	FOREIGN KEY (`entry_id`) REFERENCES `entry`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`tag_id`) REFERENCES `tag`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`entry_id`) REFERENCES `entry`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`tag_id`) REFERENCES `tag`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `wish` (

@@ -173,6 +173,10 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
   };
 
   const insertWish = async () => {
+    if (drawerContext!!.drawerState.collectionId <= -1) {
+      return;
+    }
+
     const [newWish] = await database
       .insert(wish)
       .values({

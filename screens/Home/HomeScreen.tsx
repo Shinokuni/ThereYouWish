@@ -1,13 +1,14 @@
 import React from 'react';
 import {FlatList, SafeAreaView, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {ActivityIndicator, Appbar, FAB, Text} from 'react-native-paper';
+import {ActivityIndicator, Appbar, FAB, Menu, Text} from 'react-native-paper';
 
 import style from './style';
 import WishItem from '../../components/WishItem/WishItem';
 import useGlobalStyle from '../../components/globalStyle';
 import useHomeViewModel from './HomeViewModel';
 import {WishState} from '../../contexts/DrawerContext';
+import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -25,6 +26,23 @@ const HomeScreen = () => {
           }}
         />
         <Appbar.Content title="Wishes" />
+        <Menu
+          visible={viewModel.isAppbarMenuVisible}
+          onDismiss={() => viewModel.setAppbarMenuVisible(false)}
+          anchor={
+            <Appbar.Action
+              icon="dots-vertical"
+              onPress={() => viewModel.setAppbarMenuVisible(true)}
+            />
+          }>
+          <Menu.Item
+            title={'New collection'}
+            onPress={() => {
+              viewModel.setAppbarMenuVisible(false);
+              viewModel.setNewCollectionDialogVisible(true);
+            }}
+          />
+        </Menu>
       </Appbar.Header>
 
       {viewModel.isLoading ? (
@@ -61,6 +79,22 @@ const HomeScreen = () => {
           <Text variant={'headlineMedium'}>No wish</Text>
         </View>
       )}
+
+      <TextInputDialog
+        title={'New collection'}
+        value={viewModel.collectionName}
+        visible={viewModel.isNewCollectionDialogVisible}
+        onValueChange={viewModel.setCollectionName}
+        onValidate={() => {
+          viewModel.setNewCollectionDialogVisible(false);
+          viewModel.insertCollection(viewModel.collectionName);
+          viewModel.setCollectionName('');
+        }}
+        onDismiss={() => {
+          viewModel.setNewCollectionDialogVisible(false);
+          viewModel.setCollectionName('');
+        }}
+      />
 
       <FAB
         style={style.fab}

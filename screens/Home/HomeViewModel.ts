@@ -2,7 +2,15 @@ import {useEffect, useMemo, useState} from 'react';
 import {drizzle, useLiveQuery} from 'drizzle-orm/expo-sqlite';
 import {useSQLiteContext} from 'expo-sqlite';
 import {FullEntry, FullWish} from '../../components/WishItem/WishItem';
-import {entry, image, link, tag, tagJoin, wish} from '../../db/schema';
+import {
+  collection,
+  entry,
+  image,
+  link,
+  tag,
+  tagJoin,
+  wish,
+} from '../../db/schema';
 import {eq, and} from 'drizzle-orm';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 
@@ -14,12 +22,21 @@ const useHomeViewModel = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [wishes, setWishes] = useState<FullWish[]>([]);
 
+  const [isAppbarMenuVisible, setAppbarMenuVisible] = useState(false);
+  const [isNewCollectionDialogVisible, setNewCollectionDialogVisible] =
+    useState(false);
+  const [collectionName, setCollectionName] = useState('');
+
   const deleteWish = async (wishId: number) => {
     await database.delete(wish).where(eq(wish.id, wishId));
   };
 
   const updateWishState = async (wishId: number, state: WishState) => {
     await database.update(wish).set({state: state}).where(eq(wish.id, wishId));
+  };
+
+  const insertCollection = async (name: string) => {
+    await database.insert(collection).values({name: name, current: false});
   };
 
   const {data} = useLiveQuery(
@@ -101,6 +118,13 @@ const useHomeViewModel = () => {
     wishes,
     deleteWish,
     updateWishState,
+    isAppbarMenuVisible,
+    setAppbarMenuVisible,
+    isNewCollectionDialogVisible,
+    setNewCollectionDialogVisible,
+    collectionName,
+    setCollectionName,
+    insertCollection,
   };
 };
 
