@@ -1,4 +1,4 @@
-import React, {forwardRef, useState} from 'react';
+import React, {forwardRef, useEffect, useState} from 'react';
 import {
   BottomSheetFlatList,
   BottomSheetModal,
@@ -32,7 +32,11 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
   const [isTagError, setTagError] = useState(false);
   const theme = useTheme();
 
-  const [tags, setTags] = useState<Tag[]>([...props.tags]);
+  const [tags, setTags] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    setTags(props.tags);
+  }, [props.tags]);
 
   return (
     <BottomSheetModalProvider>

@@ -45,6 +45,7 @@ const style = StyleSheet.create({
   tagList: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    flexShrink: 1,
     alignItems: 'center',
   },
   tag: {
