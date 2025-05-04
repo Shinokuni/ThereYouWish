@@ -22,7 +22,7 @@ const openImagePicker = async () => {
     const copyResults = await keepLocalCopy({
       files: [
         {uri: files[0].uri, fileName: files[0].uri},
-        ...files.slice(1).map(value => ({
+        ...files.map(value => ({
           uri: value.uri,
           fileName: value.name!!,
         })),
