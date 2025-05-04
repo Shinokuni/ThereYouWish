@@ -302,7 +302,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
             style={style.validate}
             onPress={async () => {
               if (viewModel.checkFields()) {
-                if (route.params) {
+                if (route.params.fullWish) {
                   await viewModel.updateWish();
                 } else {
                   await viewModel.insertWish();
@@ -310,7 +310,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                 navigation.goBack();
               }
             }}>
-            {route.params ? 'Update' : 'Validate'}
+            {route.params.fullWish ? 'Update' : 'Validate'}
           </Button>
         </ScrollView>
       </KeyboardAvoidingView>
