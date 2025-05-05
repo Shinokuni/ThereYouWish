@@ -62,6 +62,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
   const [isLinkDialogVisible, setLinkDialogVisible] = useState(false);
   const [linkDialogValue, setLinkDialogValue] = useState('');
 
+  const [isLoadingDialogVisible, setLoadingDialogVisible] = useState(false);
+
   const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
     setTags(newTags);
@@ -225,6 +227,7 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
   };
 
   const parseLink = async (newLink: string) => {
+    setLoadingDialogVisible(true);
     const response = await fetch(newLink);
     const text = await response.text();
 
@@ -241,6 +244,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     if (result.imageUrl) {
       setImages([...images, result.imageUrl]);
     }
+
+    setLoadingDialogVisible(false);
   };
 
   return {
@@ -276,6 +281,7 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     setLinkDialogVisible,
     linkDialogValue,
     setLinkDialogValue,
+    isLoadingDialogVisible,
     parseLink,
   };
 };

@@ -31,6 +31,7 @@ import WishImages from '../../components/WishImages/WishImages';
 import useNewWishViewModel from './NewWishViewModel';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 import {FullWish} from '../../components/WishItem/WishItem';
+import LoadingDialog from '../../components/LoadingDialog/LoadingDialog';
 
 type NewWishScreenProps = StaticScreenProps<{
   fullWish?: FullWish;
@@ -351,6 +352,11 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
           viewModel.setLinkDialogVisible(false);
           viewModel.setLinkDialogValue('');
         }}
+      />
+
+      <LoadingDialog
+        title={'Analyzing content'}
+        visible={viewModel.isLoadingDialogVisible}
       />
     </SafeAreaView>
   );
