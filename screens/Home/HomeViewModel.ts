@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {drizzle, useLiveQuery} from 'drizzle-orm/expo-sqlite';
 import {useSQLiteContext} from 'expo-sqlite';
 import {FullEntry, FullWish} from '../../components/WishItem/WishItem';
@@ -66,52 +66,52 @@ const useHomeViewModel = () => {
 
   const allTags = useLiveQuery(database.select().from(tag)).data;
 
-  useEffect(() => {
-    const loadFullWishes = async () => {
-      const fullWishes: FullWish[] = [];
+  const loadFullWishes = useCallback(async () => {
+    const fullWishes: FullWish[] = [];
 
-      for (const dbWish of data) {
-        const dbEntries = await database
+    for (const dbWish of data) {
+      const dbEntries = await database
+        .select()
+        .from(entry)
+        .where(eq(entry.wishId, dbWish.id));
+
+      const fullEntries: FullEntry[] = [];
+
+      for (const dbEntry of dbEntries) {
+        const tags = await database
+          .select({id: tag.id, name: tag.name})
+          .from(tag)
+          .innerJoin(tagJoin, eq(tag.id, tagJoin.tagId))
+          .where(eq(tagJoin.entryId, dbEntry.id));
+
+        const links = await database
           .select()
-          .from(entry)
-          .where(eq(entry.wishId, dbWish.id));
+          .from(link)
+          .where(eq(link.entryId, dbEntry.id));
 
-        const fullEntries: FullEntry[] = [];
+        const images = await database
+          .select()
+          .from(image)
+          .where(eq(image.entryId, dbEntry.id));
 
-        for (const dbEntry of dbEntries) {
-          const tags = await database
-            .select({id: tag.id, name: tag.name})
-            .from(tag)
-            .innerJoin(tagJoin, eq(tag.id, tagJoin.tagId))
-            .where(eq(tagJoin.entryId, dbEntry.id));
-
-          const links = await database
-            .select()
-            .from(link)
-            .where(eq(link.entryId, dbEntry.id));
-
-          const images = await database
-            .select()
-            .from(image)
-            .where(eq(image.entryId, dbEntry.id));
-
-          fullEntries.push({
-            entry: dbEntry,
-            tags: tags,
-            links: links,
-            images: images,
-          });
-        }
-
-        fullWishes.push({wish: dbWish, entries: fullEntries});
+        fullEntries.push({
+          entry: dbEntry,
+          tags: tags,
+          links: links,
+          images: images,
+        });
       }
 
-      setWishes(fullWishes);
-      setIsLoading(false);
-    };
+      fullWishes.push({wish: dbWish, entries: fullEntries});
+    }
 
-    loadFullWishes();
+    setWishes(fullWishes);
+    setIsLoading(false);
   }, [data, allTags, database]);
+
+  useEffect(() => {
+    loadFullWishes();
+  }, [loadFullWishes]);
 
   return {
     isLoading,
@@ -125,6 +125,7 @@ const useHomeViewModel = () => {
     collectionName,
     setCollectionName,
     insertCollection,
+    loadFullWishes,
   };
 };
 

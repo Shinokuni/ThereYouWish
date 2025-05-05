@@ -304,10 +304,14 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
               if (viewModel.checkFields()) {
                 if (route.params.fullWish) {
                   await viewModel.updateWish();
+                  navigation.popTo('Drawer', {
+                    screen: 'Home',
+                    params: {refreshWishes: true},
+                  });
                 } else {
                   await viewModel.insertWish();
+                  navigation.goBack();
                 }
-                navigation.goBack();
               }
             }}>
             {route.params.fullWish ? 'Update' : 'Validate'}

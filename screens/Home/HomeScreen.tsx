@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, SafeAreaView, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {StaticScreenProps, useNavigation} from '@react-navigation/native';
 import {ActivityIndicator, Appbar, FAB, Menu, Text} from 'react-native-paper';
 
 import style from './style';
@@ -10,11 +10,21 @@ import useHomeViewModel from './HomeViewModel';
 import {WishState} from '../../contexts/DrawerContext';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 
-const HomeScreen = () => {
+type HomeScreenProps = StaticScreenProps<{
+  refreshWishes?: boolean;
+}>;
+
+const HomeScreen = ({route}: HomeScreenProps) => {
   const navigation = useNavigation();
   const globalStyle = useGlobalStyle();
 
   const viewModel = useHomeViewModel();
+
+  useEffect(() => {
+    if (route.params && route.params.refreshWishes) {
+      viewModel.loadFullWishes();
+    }
+  }, [route.params]);
 
   return (
     <SafeAreaView style={globalStyle.screenContainer}>
