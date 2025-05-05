@@ -9,6 +9,7 @@ import style from './style';
 import DropdownMenu from '../DropdownMenu/DropdownMenu';
 import FixedHeightImage from '../FixedHeightImage/FixedHeightImage';
 import {WishState} from '../../contexts/DrawerContext';
+import { useTranslation } from 'react-i18next';
 
 const formatPrice = (price: number) => {
   const [locale] = getLocales();
@@ -53,6 +54,7 @@ const WishItem = ({
   const entry = fullEntry.entry;
 
   const theme = useTheme();
+  const {t} = useTranslation();
 
   return (
     <Card style={{...style.container}}>
@@ -168,13 +170,13 @@ const WishItem = ({
           <DropdownMenu
             actions={[
               {
-                name: 'Edit',
+                name: t('edit'),
                 onClick: () => {
                   onEditWish();
                 },
               },
               {
-                name: 'Delete',
+                name: t('delete'),
                 onClick: () => {
                   onDeleteWish();
                 },

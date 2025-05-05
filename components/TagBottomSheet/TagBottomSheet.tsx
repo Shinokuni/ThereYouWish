@@ -17,6 +17,7 @@ import {View} from 'react-native';
 import {Tag} from '../../db/schema';
 import style from './style';
 import Icon from '@react-native-vector-icons/material-design-icons';
+import {useTranslation} from 'react-i18next';
 
 type TagBottomSheetProps = {
   tags: Tag[];
@@ -28,10 +29,11 @@ type TagBottomSheetProps = {
 export type Ref = BottomSheetModal;
 
 const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
+  const theme = useTheme();
+  const {t} = useTranslation();
+
   const [search, setSearch] = useState('');
   const [isTagError, setTagError] = useState(false);
-  const theme = useTheme();
-
   const [tags, setTags] = useState<Tag[]>([]);
 
   useEffect(() => {
@@ -44,7 +46,7 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
         <BottomSheetView
           style={{...style.container, backgroundColor: theme.colors.surface}}>
           <View style={style.titleContainer}>
-            <Text variant={'headlineSmall'}>Choose tags</Text>
+            <Text variant={'headlineSmall'}>{t('choose_tags')}</Text>
           </View>
 
           <View style={style.searchContainer}>
@@ -74,7 +76,7 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
                     setTags(props.tags);
                   }
                 }}
-                placeholder={'Search or create a tag...'}
+                placeholder={t('search_create_tag')}
                 style={{
                   ...style.searchInput,
                   backgroundColor: theme.colors.secondaryContainer,
@@ -112,12 +114,12 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
             />
           </View>
           <HelperText type={'error'} visible={isTagError}>
-            Tag already exists
+            {t('tag_already_exists')}
           </HelperText>
 
           {tags.length > 0 ? (
             <BottomSheetFlatList
-              ListHeaderComponent={<Text>Tags</Text>}
+              ListHeaderComponent={<Text>{t('tags')}</Text>}
               data={tags}
               keyExtractor={item => item.id.toString()}
               renderItem={({item}) => {
@@ -153,7 +155,7 @@ const TagBottomSheet = forwardRef<Ref, TagBottomSheetProps>((props, ref) => {
             />
           ) : (
             <View style={style.placeholder}>
-              <Text variant={'bodyMedium'}>No tag available</Text>
+              <Text variant={'bodyMedium'}>{t('no_tag_available')}</Text>
             </View>
           )}
         </BottomSheetView>

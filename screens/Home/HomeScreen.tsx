@@ -9,6 +9,7 @@ import useGlobalStyle from '../../components/globalStyle';
 import useHomeViewModel from './HomeViewModel';
 import {WishState} from '../../contexts/DrawerContext';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
+import {useTranslation} from 'react-i18next';
 
 type HomeScreenProps = StaticScreenProps<{
   refreshWishes?: boolean;
@@ -17,6 +18,7 @@ type HomeScreenProps = StaticScreenProps<{
 const HomeScreen = ({route}: HomeScreenProps) => {
   const navigation = useNavigation();
   const globalStyle = useGlobalStyle();
+  const {t} = useTranslation();
 
   const viewModel = useHomeViewModel();
 
@@ -35,7 +37,7 @@ const HomeScreen = ({route}: HomeScreenProps) => {
             navigation.openDrawer();
           }}
         />
-        <Appbar.Content title="Wishes" />
+        <Appbar.Content title={t('wishes')} />
         <Menu
           visible={viewModel.isAppbarMenuVisible}
           onDismiss={() => viewModel.setAppbarMenuVisible(false)}
@@ -46,7 +48,7 @@ const HomeScreen = ({route}: HomeScreenProps) => {
             />
           }>
           <Menu.Item
-            title={'New collection'}
+            title={t('new_collection')}
             onPress={() => {
               viewModel.setAppbarMenuVisible(false);
               viewModel.setNewCollectionDialogVisible(true);
@@ -91,7 +93,7 @@ const HomeScreen = ({route}: HomeScreenProps) => {
       )}
 
       <TextInputDialog
-        title={'New collection'}
+        title={t('new_collection')}
         value={viewModel.collectionName}
         visible={viewModel.isNewCollectionDialogVisible}
         onValueChange={viewModel.setCollectionName}

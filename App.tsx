@@ -7,6 +7,7 @@ import migrations from './drizzle/migrations';
 import {DrawerContextProvider} from './contexts/DrawerContext';
 import {collection} from './db/schema';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import './i18n/i18n';
 
 const App = () => {
   const expo = openDatabaseSync('thereyouwish.db', {

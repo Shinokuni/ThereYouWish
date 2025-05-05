@@ -32,6 +32,7 @@ import useNewWishViewModel from './NewWishViewModel';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 import {FullWish} from '../../components/WishItem/WishItem';
 import LoadingDialog from '../../components/LoadingDialog/LoadingDialog';
+import {useTranslation} from 'react-i18next';
 
 type NewWishScreenProps = StaticScreenProps<{
   fullWish?: FullWish;
@@ -41,6 +42,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
   const navigation = useNavigation();
   const theme = useTheme();
   const globalStyle = useGlobalStyle();
+  const {t} = useTranslation();
 
   const viewModel = useNewWishViewModel({
     fullWish: route.params ? route.params.fullWish : undefined,
@@ -62,7 +64,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
             navigation.goBack();
           }}
         />
-        <Appbar.Content title="New wish" />
+        <Appbar.Content title={t('new_wish')} />
         <Appbar.Action
           icon={'link-plus'}
           onPress={() => {
@@ -77,7 +79,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
           showsVerticalScrollIndicator={false}
           automaticallyAdjustKeyboardInsets={true}>
           <Text variant={'labelLarge'} style={style.label}>
-            Title*
+            {t('title')}
           </Text>
           <TextInput
             value={viewModel.title}
@@ -86,7 +88,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
               viewModel.setTitleError(false);
             }}
             mode="flat"
-            placeholder={'Enter a title...'}
+            placeholder={t('enter_title')}
             numberOfLines={1}
             error={viewModel.isTitleError}
             right={
@@ -110,18 +112,18 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
             }}
           />
           <HelperText type="error" visible={viewModel.isTitleError}>
-            Title can't be empty
+            {t('title_cant_be_empty')}
           </HelperText>
 
           <Text variant={'labelLarge'} style={style.label}>
-            Description
+            {t('description')}
           </Text>
           <TextInput
             ref={descriptionRef}
             value={viewModel.description}
             onChangeText={viewModel.setDescription}
             style={[style.baseInput, style.descriptionInput]}
-            placeholder={'Enter a description...'}
+            placeholder={t('enter_description')}
             multiline={true}
             numberOfLines={5}
             right={
@@ -147,13 +149,13 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
           <View style={style.priceDateContainer}>
             <View style={style.priceContainer}>
               <Text variant={'labelLarge'} style={style.label}>
-                Price
+                {t('price')}
               </Text>
               <TextInput
                 ref={priceRef}
                 value={viewModel.price}
                 onChangeText={viewModel.setPrice}
-                placeholder={'Enter a price'}
+                placeholder={t('enter_a_price')}
                 keyboardType="numeric"
                 numberOfLines={1}
                 style={style.baseInput}
@@ -170,7 +172,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
 
             <View style={style.dateContainer}>
               <Text variant={'labelLarge'} style={style.label}>
-                Deadline
+                {t('deadline')}
               </Text>
               <Pressable
                 onPress={() => {
@@ -181,7 +183,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                     locale.languageCode,
                   )}
                   editable={false}
-                  placeholder={'Deadline'}
+                  placeholder={t('deadline')}
                   keyboardType="numeric"
                   numberOfLines={1}
                   style={style.baseInput}
@@ -218,7 +220,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
           </View>
 
           <Text variant={'labelLarge'} style={style.label}>
-            Links
+            {t('links')}
           </Text>
           <WishLinks
             links={viewModel.links}
@@ -246,7 +248,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
           />
 
           <Text variant={'labelLarge'} style={style.label}>
-            Tags
+            {t('tags')}
           </Text>
           <Pressable
             onPress={() => {
@@ -272,14 +274,14 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                 </View>
               ) : (
                 <View style={style.tagMessage}>
-                  <Text>Add tag</Text>
+                  <Text>{t('add_tag')}</Text>
                 </View>
               )}
             </Surface>
           </Pressable>
 
           <Text variant={'labelLarge'} style={style.label}>
-            Images
+            {t('images')}
           </Text>
           <WishImages
             images={viewModel.images}
@@ -315,7 +317,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                 }
               }
             }}>
-            {route.params.fullWish ? 'Update' : 'Validate'}
+            {route.params.fullWish ? t('update') : t('validate')}
           </Button>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -339,7 +341,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
       />
 
       <TextInputDialog
-        title={'Generate infos from link'}
+        title={t('generate_infos_link')}
         value={viewModel.linkDialogValue}
         visible={viewModel.isLinkDialogVisible}
         onValueChange={viewModel.setLinkDialogValue}
@@ -355,7 +357,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
       />
 
       <LoadingDialog
-        title={'Analyzing content'}
+        title={t('analyzing_content')}
         visible={viewModel.isLoadingDialogVisible}
       />
     </SafeAreaView>

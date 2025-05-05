@@ -11,6 +11,7 @@ import {
 import Icon from '@react-native-vector-icons/material-design-icons';
 
 import style from './style';
+import {useTranslation} from 'react-i18next';
 
 type WishLinksProps = {
   links: URL[];
@@ -30,6 +31,7 @@ const WishLinks = ({
   onRemoveLink,
 }: WishLinksProps) => {
   const theme = useTheme();
+  const {t} = useTranslation();
 
   return (
     <Surface style={style.surface}>
@@ -37,7 +39,7 @@ const WishLinks = ({
         <TextInput
           value={linkValue}
           onChangeText={onLinkValueChange}
-          placeholder={'Add link...'}
+          placeholder={t('add_link')}
           underlineColor="transparent"
           activeUnderlineColor="transparent"
           cursorColor={theme.colors.primary}
@@ -56,7 +58,7 @@ const WishLinks = ({
 
         {isLinkError && (
           <HelperText type={'error'} visible={isLinkError}>
-            Entered value is not a valid URL
+            {t('entered_value_not_valid_url')}
           </HelperText>
         )}
       </View>

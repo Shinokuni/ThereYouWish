@@ -6,6 +6,7 @@ import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import DropdownMenu, {Action} from '../../components/DropdownMenu/DropdownMenu';
 import useDrawerViewModel from './DrawerViewModel';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
+import {useTranslation} from 'react-i18next';
 
 const DrawerMenu = (actions: Action[]) => {
   return <DropdownMenu actions={actions} />;
@@ -14,12 +15,15 @@ const DrawerMenu = (actions: Action[]) => {
 const DrawerScreen = () => {
   const drawerContext = useDrawerContext();
   const viewModel = useDrawerViewModel();
+  const {t} = useTranslation();
 
   return (
     <>
       <TextInputDialog
         title={
-          viewModel.renameType === 'tag' ? 'Rename tag' : 'Rename collection'
+          viewModel.renameType === 'tag'
+            ? t('rename_tag')
+            : t('rename_collection')
         }
         value={viewModel.renameValue}
         visible={viewModel.isRenameDialogVisible}
@@ -40,9 +44,9 @@ const DrawerScreen = () => {
         }}
       />
       <DrawerContentScrollView>
-        <Drawer.Section title="Status">
+        <Drawer.Section title={t('status')}>
           <Drawer.Item
-            label="All"
+            label={t('all')}
             icon={'apps'}
             active={drawerContext?.drawerState.wishState === WishState.all}
             onPress={() => {
@@ -54,7 +58,7 @@ const DrawerScreen = () => {
             }}
           />
           <Drawer.Item
-            label="On going"
+            label={t('on_going')}
             icon={'refresh'}
             active={drawerContext?.drawerState.wishState === WishState.ongoing}
             onPress={() => {
@@ -66,7 +70,7 @@ const DrawerScreen = () => {
             }}
           />
           <Drawer.Item
-            label="Done"
+            label={t('done')}
             icon={'check-all'}
             active={drawerContext?.drawerState.wishState === WishState.done}
             onPress={() => {
@@ -81,7 +85,7 @@ const DrawerScreen = () => {
           />
         </Drawer.Section>
 
-        <Drawer.Section title="Collections">
+        <Drawer.Section title={t('collections')}>
           {viewModel.collections.length > 0 &&
             viewModel.collections.map(collection => (
               <Drawer.Item
@@ -92,7 +96,7 @@ const DrawerScreen = () => {
                 right={() =>
                   DrawerMenu([
                     {
-                      name: 'Rename',
+                      name: t('rename'),
                       onClick: () => {
                         viewModel.setRenameValue(collection.name);
                         viewModel.setRenameId(collection.id);
@@ -101,7 +105,7 @@ const DrawerScreen = () => {
                       },
                     },
                     {
-                      name: 'Delete',
+                      name: t('delete'),
                       onClick: async () => {
                         await viewModel.deleteCollection(collection.id);
                       },
@@ -119,7 +123,7 @@ const DrawerScreen = () => {
             ))}
         </Drawer.Section>
 
-        <Drawer.Section title="Tags" showDivider={false}>
+        <Drawer.Section title={t('tags')} showDivider={false}>
           {viewModel.tags.length > 0 &&
             viewModel.tags.map(tag => (
               <Drawer.Item
@@ -136,7 +140,7 @@ const DrawerScreen = () => {
                 right={() =>
                   DrawerMenu([
                     {
-                      name: 'Rename',
+                      name: t('rename'),
                       onClick: () => {
                         viewModel.setRenameValue(tag.name);
                         viewModel.setRenameType('tag');
@@ -145,7 +149,7 @@ const DrawerScreen = () => {
                       },
                     },
                     {
-                      name: 'Delete',
+                      name: t('delete'),
                       onClick: async () => {
                         await viewModel.deleteTag(tag.id);
                       },
