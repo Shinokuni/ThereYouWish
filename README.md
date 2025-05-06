@@ -1,6 +1,24 @@
-# ThereYouWish
+<p align="center" >
+    <img src="fastlane/metadata/android/en-US/images/icon.png" width=180 style="border-radius:80px">
+</p>
 
-Open source local wishlist mobile app. Under early development.
+<h1 align="center"><b>ThereYouWish</b></h1>
+
+<h4 align="center">Local wishlist mobile app. Gather all your wishes in a single place.</h4>
+
+# Features
+
+- Create/update/delete your wishes
+- Use collections and tags to order them
+- Extract content from the web to fill your wish (via an url)
+
+# Screenshots
+
+To come.
+
+# Credits
+
+App icon made by [monkik](https://www.flaticon.com/free-icon/wish-list_776648) on [flaticon.com](https://www.flaticon.com).
 
 # Licence
 
