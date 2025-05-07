@@ -2,12 +2,12 @@ import React, {Suspense} from 'react';
 import {AppRegistry, useColorScheme} from 'react-native';
 import {MD3DarkTheme, PaperProvider} from 'react-native-paper';
 
-import App from './App';
+import App from './src/App';
 import {name as appName} from './app.json';
 import Icon from '@react-native-vector-icons/material-design-icons';
 import {MD3LightTheme} from 'react-native-paper';
-import LightTheme from './util/theme/light_theme.json';
-import DarkTheme from './util/theme/dark_theme.json';
+import LightTheme from './src/util/theme/light_theme.json';
+import DarkTheme from './src/util/theme/dark_theme.json';
 
 const lightTheme = {
   ...MD3LightTheme,
