@@ -25,7 +25,7 @@ const TextInputDialog = ({
         <Dialog.Content>
           <TextInput
             mode="outlined"
-            value={value}
+            defaultValue={value}
             onChangeText={onValueChange}
           />
         </Dialog.Content>
