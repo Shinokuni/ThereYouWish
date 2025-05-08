@@ -45,6 +45,8 @@ const WishLinks = ({
           cursorColor={theme.colors.primary}
           style={style.baseInput}
           returnKeyType="next"
+          multiline={false}
+          numberOfLines={1}
           left={<TextInput.Icon icon="link-plus" />}
           right={
             <TextInput.Icon
