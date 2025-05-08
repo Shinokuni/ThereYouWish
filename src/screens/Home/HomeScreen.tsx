@@ -88,7 +88,7 @@ const HomeScreen = ({route}: HomeScreenProps) => {
         />
       ) : (
         <View style={style.centerContainer}>
-          <Text variant={'headlineMedium'}>No wish</Text>
+          <Text variant={'headlineMedium'}>{t('no_wish')}</Text>
         </View>
       )}
 

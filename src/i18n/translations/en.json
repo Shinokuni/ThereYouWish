@@ -35,5 +35,6 @@
   "add_link": "Add link...",
   "entered_value_not_valid_url": "Entered value is not a valid URL",
   "no_collection": "No collection",
-  "create_new_collection": "Please create a collection before creating a new wish."
+  "create_new_collection": "Please create a collection before creating a new wish.",
+  "no_wish": "No wish"
 }
