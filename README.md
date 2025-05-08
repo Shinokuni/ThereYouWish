@@ -6,6 +6,11 @@
 
 <h4 align="center">Local wishlist mobile app. Gather all your wishes in a single place.</h4>
 
+<p align="center">
+    <a href="https://github.com/Shinokuni/ThereYouWish/releases"><img src="images/get-it-on-github.png" width=250></a>
+</p>
+
+
 # Features
 
 - Create/update/delete your wishes
