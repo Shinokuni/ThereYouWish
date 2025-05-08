@@ -227,6 +227,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
           images.map(newImage => ({url: newImage, entryId: newEntry.id})),
         );
     }
+
+    return true;
   };
 
   const parseLink = async (newLink: string) => {
@@ -249,8 +251,6 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     }
 
     setLoadingDialogVisible(false);
-
-    return true;
   };
 
   return {
