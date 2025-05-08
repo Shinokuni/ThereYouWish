@@ -33,6 +33,7 @@ import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 import {FullWish} from '../../components/WishItem/WishItem';
 import LoadingDialog from '../../components/LoadingDialog/LoadingDialog';
 import {useTranslation} from 'react-i18next';
+import AlertDialog from '../../components/AlertDialog/AlertDialog';
 
 type NewWishScreenProps = StaticScreenProps<{
   fullWish?: FullWish;
@@ -312,8 +313,9 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                     params: {refreshWishes: true},
                   });
                 } else {
-                  await viewModel.insertWish();
-                  navigation.goBack();
+                  if (await viewModel.insertWish()) {
+                    navigation.goBack();
+                  }
                 }
               }
             }}>
@@ -359,6 +361,15 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
       <LoadingDialog
         title={t('analyzing_content')}
         visible={viewModel.isLoadingDialogVisible}
+      />
+
+      <AlertDialog
+        title={t('no_collection')}
+        text={t('create_new_collection')}
+        visible={viewModel.isNoCollectionDialogVisible}
+        onDismiss={() => {
+          viewModel.setNoCollectionDialogVisible(false);
+        }}
       />
     </SafeAreaView>
   );

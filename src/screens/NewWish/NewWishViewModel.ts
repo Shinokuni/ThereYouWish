@@ -63,6 +63,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
   const [linkDialogValue, setLinkDialogValue] = useState('');
 
   const [isLoadingDialogVisible, setLoadingDialogVisible] = useState(false);
+  const [isNoCollectionDialogVisible, setNoCollectionDialogVisible] =
+    useState(false);
 
   const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
@@ -175,8 +177,9 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
   };
 
   const insertWish = async () => {
-    if (drawerContext!!.drawerState.collectionId <= -1) {
-      return;
+    if (drawerContext!!.drawerState.collectionId === -1) {
+      setNoCollectionDialogVisible(true);
+      return false;
     }
 
     const [newWish] = await database
@@ -246,6 +249,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     }
 
     setLoadingDialogVisible(false);
+
+    return true;
   };
 
   return {
@@ -282,6 +287,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     linkDialogValue,
     setLinkDialogValue,
     isLoadingDialogVisible,
+    isNoCollectionDialogVisible,
+    setNoCollectionDialogVisible,
     parseLink,
   };
 };
