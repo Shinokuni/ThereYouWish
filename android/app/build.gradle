@@ -86,6 +86,19 @@ android {
         versionName "0.0.1-dev"
     }
     signingConfigs {
+        release {
+            try {
+                def properties = new Properties()
+                properties.load(new FileInputStream((rootProject.file("signing.properties"))))
+                storeFile file(properties['STORE_FILE'])
+                storePassword properties['STORE_PASSWORD']
+                keyAlias properties['KEY_ALIAS']
+                keyPassword properties['KEY_PASSWORD']
+            } catch (Exception e) {
+                // catch exception if file doesn't exist, useful for potential newcomers
+                println(e)
+            }
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
@@ -96,11 +109,10 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            applicationIdSuffix = ".debug"
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
