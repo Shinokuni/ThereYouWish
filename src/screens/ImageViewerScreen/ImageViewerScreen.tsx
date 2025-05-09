@@ -15,7 +15,6 @@ type ImageViewerScreenProps = StaticScreenProps<{
 const ImageViewerScreen = ({route}: ImageViewerScreenProps) => {
   const navigation = useNavigation();
   const width = Dimensions.get('window').width;
-  const height = Dimensions.get('window').height;
 
   const [baseIndex, setIndex] = useState(route.params.index);
 
@@ -36,7 +35,6 @@ const ImageViewerScreen = ({route}: ImageViewerScreenProps) => {
       <View style={style.carouselContainer}>
         <Carousel
           width={width}
-          height={height / 2}
           loop={false}
           defaultIndex={route.params.index}
           data={route.params.images}
