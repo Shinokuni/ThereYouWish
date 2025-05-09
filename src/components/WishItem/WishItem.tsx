@@ -3,13 +3,14 @@ import {FlatList, Linking, Share, View} from 'react-native';
 import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
 import {getCurrencies, getLocales} from 'react-native-localize';
 import Icon from '@react-native-vector-icons/material-design-icons';
+import ViewMoreText from 'react-native-view-more-text';
 
 import {Entry, Image, Link, Tag, Wish} from '../../db/schema';
 import style from './style';
 import DropdownMenu from '../DropdownMenu/DropdownMenu';
 import FixedHeightImage from '../FixedHeightImage/FixedHeightImage';
 import {WishState} from '../../contexts/DrawerContext';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
 const formatPrice = (price: number) => {
   const [locale] = getLocales();
@@ -77,9 +78,26 @@ const WishItem = ({
         )}
       </View>
       {entry.description && (
-        <Text variant={'bodyLarge'} style={style.description}>
-          {entry.description}
-        </Text>
+        <ViewMoreText
+          numberOfLines={3}
+          renderViewMore={onPress => (
+            <Text
+              onPress={onPress}
+              style={{...style.viewLessMore, color: theme.colors.primary}}>
+              View more
+            </Text>
+          )}
+          renderViewLess={onPress => (
+            <Text
+              onPress={onPress}
+              style={{...style.viewLessMore, color: theme.colors.primary}}>
+              View less
+            </Text>
+          )}>
+          <Text variant={'bodyLarge'} style={style.description}>
+            {entry.description}
+          </Text>
+        </ViewMoreText>
       )}
 
       {tags.length > 0 && (

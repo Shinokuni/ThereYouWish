@@ -64,6 +64,10 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
+  viewLessMore: {
+    textDecorationLine: 'underline',
+    marginBottom: 8,
+  },
 });
 
 export default style;
