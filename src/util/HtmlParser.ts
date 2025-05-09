@@ -42,9 +42,11 @@ class HtmlParser {
     );
 
     if (element?.name === 'title') {
-      return DomUtils.innerText(element.firstChild!!);
+      return DomUtils.innerText(element.firstChild!!)
+        .replace(/[\n\r]+/g, '')
+        .trim();
     } else {
-      return element?.attribs.content.trim();
+      return element?.attribs.content.replace(/[\n\r]+/g, '').trim();
     }
   }
 
