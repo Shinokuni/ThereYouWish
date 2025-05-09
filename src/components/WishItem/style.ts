@@ -66,6 +66,7 @@ const style = StyleSheet.create({
   },
   viewLessMore: {
     textDecorationLine: 'underline',
+    marginTop: -8, // more than a hack than anything else
     marginBottom: 8,
   },
 });

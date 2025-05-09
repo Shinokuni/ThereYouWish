@@ -7,7 +7,7 @@ import ViewMoreText from 'react-native-view-more-text';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 
-import {Entry, image, Image, Link, Tag, Wish} from '../../db/schema';
+import {Entry, Image, Link, Tag, Wish} from '../../db/schema';
 import style from './style';
 import DropdownMenu from '../DropdownMenu/DropdownMenu';
 import FixedHeightImage from '../FixedHeightImage/FixedHeightImage';
@@ -82,6 +82,7 @@ const WishItem = ({
       {entry.description && (
         <ViewMoreText
           numberOfLines={3}
+          textStyle={style.description}
           renderViewMore={onPress => (
             <Text
               onPress={onPress}
@@ -96,9 +97,7 @@ const WishItem = ({
               View less
             </Text>
           )}>
-          <Text variant={'bodyLarge'} style={style.description}>
-            {entry.description}
-          </Text>
+          <Text variant={'bodyLarge'}>{entry.description}</Text>
         </ViewMoreText>
       )}
 
