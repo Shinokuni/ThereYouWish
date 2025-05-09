@@ -17,16 +17,22 @@ class HtmlParser {
     const head = DomUtils.findOne(element => element.name === 'head', dom);
 
     if (head) {
-      return {
-        title: this.parseTitle(head),
-        description: this.parseDescription(head),
-        price: this.parsePrice(head),
-        url: this.parseUrl(head),
-        imageUrl: this.parseImageUrl(head),
-      };
+      const jsonld = this.parseJsonLD(head);
+
+      return jsonld ?? this.parseHead(head);
     } else {
       return {};
     }
+  }
+
+  private parseHead(head: Element): ParsingResult {
+    return {
+      title: this.parseTitle(head),
+      description: this.parseDescription(head),
+      price: this.parsePrice(head),
+      url: this.parseUrl(head),
+      imageUrl: this.parseImageUrl(head),
+    };
   }
 
   private parseTitle(head: Element): string | undefined {
@@ -80,6 +86,78 @@ class HtmlParser {
     );
 
     return element?.attribs.content;
+  }
+
+  private parseJsonLD(head: Element): ParsingResult | undefined {
+    const elements = CSSSelect.selectAll(
+      'script[type="application/ld+json"]',
+      head,
+    );
+
+    if (elements) {
+      for (const element of elements) {
+        const content = DomUtils.innerText(element.childNodes);
+        if (!content) {
+          continue;
+        }
+
+        const jsonLD = JSON.parse(content);
+
+        if (jsonLD['@type'] !== 'Product') {
+          continue;
+        }
+
+        const descriptionDoc = parseDocument(
+          jsonLD.description ?? this.parseDescription(head),
+        );
+
+        return {
+          title: jsonLD.name ?? this.parseTitle(head),
+          description: DomUtils.textContent(descriptionDoc.childNodes),
+          price: jsonLD.offers
+            ? this.parseJsonLDPrice(jsonLD.offers)
+            : this.parsePrice(head),
+          url: this.parseUrl(head),
+          imageUrl: jsonLD.image
+            ? this.parseJsonLDImage(jsonLD.image)
+            : this.parseImageUrl(head),
+        };
+      }
+    }
+
+    return undefined;
+  }
+
+  private parseJsonLDPrice(offers: any): string | undefined {
+    if (Array.isArray(offers) && offers.length > 0) {
+      const offer = offers[0];
+
+      if (offer.priceSpecification) {
+        if (
+          Array.isArray(offer.priceSpecification) &&
+          offer.priceSpecification.length > 0
+        ) {
+          return offer.priceSpecification[0].price.toString();
+        } else {
+          return offer.priceSpecification.price.toString();
+        }
+      } else {
+        return offer.price.toString();
+      }
+    } else {
+      return offers.price.toString();
+    }
+  }
+
+  private parseJsonLDImage(image: any): string | undefined {
+    switch (image.constructor) {
+      case String:
+        return image;
+      case Object:
+        return image.url;
+      case Array:
+        return image[0];
+    }
   }
 }
 
