@@ -37,5 +37,9 @@
   "no_collection": "No collection",
   "create_new_collection": "Please create a collection before creating a new wish.",
   "no_wish": "No wish",
-  "error_occured_link": "An error occured when parsing the provided link"
+  "error_occured_link": "An error occured when parsing the provided link",
+  "delete_wish": "Delete wish",
+  "delete_wish_question": "Do you want to delete {{name}}} wish?",
+  "update_wish_state": "Update wish state",
+  "mark_wish_to": "Mark wish to {{state}}?"
 }

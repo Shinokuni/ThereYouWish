@@ -5,10 +5,17 @@ type AlertDialogProps = {
   title: string;
   text: string;
   visible: boolean;
-  onDismiss: () => void;
+  onDismiss?: () => void;
+  onValidate?: () => void;
 };
 
-const AlertDialog = ({title, text, visible, onDismiss}: AlertDialogProps) => {
+const AlertDialog = ({
+  title,
+  text,
+  visible,
+  onDismiss,
+  onValidate,
+}: AlertDialogProps) => {
   return (
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss}>
@@ -17,7 +24,8 @@ const AlertDialog = ({title, text, visible, onDismiss}: AlertDialogProps) => {
           <Text variant="bodyLarge">{text}</Text>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={onDismiss}>Ok</Button>
+          {onDismiss && <Button onPress={onDismiss}>Cancel</Button>}
+          {onValidate && <Button onPress={onValidate}>Validate</Button>}
         </Dialog.Actions>
       </Dialog>
     </Portal>

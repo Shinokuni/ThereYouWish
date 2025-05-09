@@ -374,7 +374,7 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
         title={t('no_collection')}
         text={t('create_new_collection')}
         visible={viewModel.isNoCollectionDialogVisible}
-        onDismiss={() => {
+        onValidate={() => {
           viewModel.setNoCollectionDialogVisible(false);
         }}
       />

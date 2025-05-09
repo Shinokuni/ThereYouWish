@@ -37,5 +37,9 @@
   "no_collection": "Aucune collection",
   "create_new_collection": "Veuillez créer une collection avant d'ajouter un nouveau souhait.",
   "no_wish": "Aucun souhait",
-  "error_occured_link": "Une erreur est survenue lors du traitement du lien fourni"
+  "error_occured_link": "Une erreur est survenue lors du traitement du lien fourni",
+  "delete_wish": "Supprimer le souhait",
+  "delete_wish_question": "Voulez-vous supprimer le souhait {{name}}}?",
+  "update_wish_state": "Modifier l'état du souhait",
+  "mark_wish_to": "Marquer le souhait comme {{state}}?"
 }

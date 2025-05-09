@@ -9,10 +9,16 @@ import {
   link,
   tag,
   tagJoin,
+  Wish,
   wish,
 } from '../../db/schema';
 import {eq, and} from 'drizzle-orm';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
+
+export enum DialogAction {
+  deleteWish = 'deleteWish',
+  updateWishState = 'updateWishState',
+}
 
 const useHomeViewModel = () => {
   const expo = useSQLiteContext();
@@ -27,12 +33,22 @@ const useHomeViewModel = () => {
     useState(false);
   const [collectionName, setCollectionName] = useState('');
 
+  const [dialogAction, setDialogAction] = useState<DialogAction | null>(null);
+  const [selectedWish, setSelectedWish] = useState<Wish | null>(null);
+
   const deleteWish = async (wishId: number) => {
     await database.delete(wish).where(eq(wish.id, wishId));
   };
 
-  const updateWishState = async (wishId: number, state: WishState) => {
-    await database.update(wish).set({state: state}).where(eq(wish.id, wishId));
+  const updateWishState = async (wishToUpdate: Wish) => {
+    const newState =
+      wishToUpdate.state === WishState.ongoing
+        ? WishState.done
+        : WishState.ongoing;
+    await database
+      .update(wish)
+      .set({state: newState})
+      .where(eq(wish.id, wishToUpdate.id));
   };
 
   const insertCollection = async (name: string) => {
@@ -122,6 +138,10 @@ const useHomeViewModel = () => {
     setAppbarMenuVisible,
     isNewCollectionDialogVisible,
     setNewCollectionDialogVisible,
+    dialogAction,
+    setDialogAction,
+    selectedWish,
+    setSelectedWish,
     collectionName,
     setCollectionName,
     insertCollection,

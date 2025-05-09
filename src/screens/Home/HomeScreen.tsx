@@ -6,10 +6,11 @@ import {ActivityIndicator, Appbar, FAB, Menu, Text} from 'react-native-paper';
 import style from './style';
 import WishItem from '../../components/WishItem/WishItem';
 import useGlobalStyle from '../../components/globalStyle';
-import useHomeViewModel from './HomeViewModel';
+import useHomeViewModel, {DialogAction} from './HomeViewModel';
 import {WishState} from '../../contexts/DrawerContext';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 import {useTranslation} from 'react-i18next';
+import AlertDialog from '../../components/AlertDialog/AlertDialog';
 
 type HomeScreenProps = StaticScreenProps<{
   refreshWishes?: boolean;
@@ -66,6 +67,7 @@ const HomeScreen = ({route}: HomeScreenProps) => {
           data={viewModel.wishes}
           style={style.list}
           showsVerticalScrollIndicator={false}
+          keyExtractor={item => item.wish.id.toString()}
           renderItem={({item}) => (
             <WishItem
               fullWish={item}
@@ -73,18 +75,15 @@ const HomeScreen = ({route}: HomeScreenProps) => {
                 navigation.navigate('NewWish', {fullWish: item});
               }}
               onDeleteWish={async () => {
-                await viewModel.deleteWish(item.wish.id);
+                viewModel.setSelectedWish(item.wish);
+                viewModel.setDialogAction(DialogAction.deleteWish);
               }}
               onUpdateWishState={async () => {
-                const newState =
-                  item.wish.state === WishState.ongoing
-                    ? WishState.done
-                    : WishState.ongoing;
-                await viewModel.updateWishState(item.wish.id, newState);
+                viewModel.setSelectedWish(item.wish);
+                viewModel.setDialogAction(DialogAction.updateWishState);
               }}
             />
           )}
-          keyExtractor={item => item.wish.id.toString()}
         />
       ) : (
         <View style={style.centerContainer}>
@@ -113,6 +112,46 @@ const HomeScreen = ({route}: HomeScreenProps) => {
         icon={'plus'}
         onPress={() => navigation.navigate('NewWish', {})}
       />
+
+      {(() => {
+        switch (viewModel.dialogAction) {
+          case DialogAction.deleteWish:
+            return (
+              <AlertDialog
+                title={t('delete_wish')}
+                text={t('delete_wish_question', {
+                  name: viewModel.selectedWish?.name,
+                })}
+                visible={true}
+                onDismiss={() => viewModel.setDialogAction(null)}
+                onValidate={async () => {
+                  viewModel.setDialogAction(null);
+                  await viewModel.deleteWish(viewModel.selectedWish!!.id);
+                }}
+              />
+            );
+          case DialogAction.updateWishState:
+            return (
+              <AlertDialog
+                title={t('update_wish_state')}
+                text={t('mark_wish_to', {
+                  state:
+                    viewModel.selectedWish?.state === WishState.ongoing
+                      ? t('done')
+                      : t('on_going'),
+                })}
+                visible={true}
+                onDismiss={() => viewModel.setDialogAction(null)}
+                onValidate={async () => {
+                  viewModel.setDialogAction(null);
+                  await viewModel.updateWishState(viewModel.selectedWish!!);
+                }}
+              />
+            );
+          default:
+            return <View />;
+        }
+      })()}
     </SafeAreaView>
   );
 };
