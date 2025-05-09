@@ -7,7 +7,7 @@ export interface ParsingResult {
   description?: string;
   price?: string;
   url?: string;
-  imageUrl?: string;
+  images?: string[];
 }
 
 class HtmlParser {
@@ -31,7 +31,7 @@ class HtmlParser {
       description: this.parseDescription(head),
       price: this.parsePrice(head),
       url: this.parseUrl(head),
-      imageUrl: this.parseImageUrl(head),
+      images: this.parseImageUrl(head),
     };
   }
 
@@ -79,13 +79,13 @@ class HtmlParser {
     return element?.attribs.content;
   }
 
-  private parseImageUrl(head: Element): string | undefined {
-    const element = CSSSelect.selectOne(
+  private parseImageUrl(head: Element): string[] | undefined {
+    const elements = CSSSelect.selectAll(
       'meta[property="og:image"],meta[property="og:image:secure_url"],meta[name="twitter:image"]',
       head,
     );
 
-    return element?.attribs.content;
+    return elements.map(element => element.attribs.content);
   }
 
   private parseJsonLD(head: Element): ParsingResult | undefined {
@@ -118,7 +118,7 @@ class HtmlParser {
             ? this.parseJsonLDPrice(jsonLD.offers)
             : this.parsePrice(head),
           url: this.parseUrl(head),
-          imageUrl: jsonLD.image
+          images: jsonLD.image
             ? this.parseJsonLDImage(jsonLD.image)
             : this.parseImageUrl(head),
         };
@@ -149,14 +149,14 @@ class HtmlParser {
     }
   }
 
-  private parseJsonLDImage(image: any): string | undefined {
+  private parseJsonLDImage(image: any): string[] | undefined {
     switch (image.constructor) {
       case String:
-        return image;
+        return [image];
       case Object:
-        return image.url;
+        return [image.url];
       case Array:
-        return image[0];
+        return image as string[];
     }
   }
 }

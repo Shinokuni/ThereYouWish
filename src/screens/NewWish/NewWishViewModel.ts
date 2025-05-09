@@ -249,8 +249,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
         setLinks([...links, new URL(result.url)]);
       }
 
-      if (result.imageUrl) {
-        setImages([...images, result.imageUrl]);
+      if (result.images) {
+        setImages([...images, ...result.images]);
       }
     } catch (error) {
       console.log(error);
