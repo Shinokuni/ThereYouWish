@@ -4,13 +4,14 @@ import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
 import {getCurrencies, getLocales} from 'react-native-localize';
 import Icon from '@react-native-vector-icons/material-design-icons';
 import ViewMoreText from 'react-native-view-more-text';
+import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next';
 
-import {Entry, Image, Link, Tag, Wish} from '../../db/schema';
+import {Entry, image, Image, Link, Tag, Wish} from '../../db/schema';
 import style from './style';
 import DropdownMenu from '../DropdownMenu/DropdownMenu';
 import FixedHeightImage from '../FixedHeightImage/FixedHeightImage';
 import {WishState} from '../../contexts/DrawerContext';
-import {useTranslation} from 'react-i18next';
 
 const formatPrice = (price: number) => {
   const [locale] = getLocales();
@@ -55,6 +56,7 @@ const WishItem = ({
   const entry = fullEntry.entry;
 
   const theme = useTheme();
+  const navigation = useNavigation();
   const {t} = useTranslation();
 
   return (
@@ -126,6 +128,12 @@ const WishItem = ({
                 key={item.id}
                 source={{uri: item.url}}
                 style={style.image}
+                onPress={() => {
+                  navigation.navigate('ImageViewer', {
+                    images: images.map(image => image.url),
+                    index: images.indexOf(item),
+                  });
+                }}
               />
             );
           }}

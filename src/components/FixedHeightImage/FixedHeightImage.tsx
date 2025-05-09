@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Image, ImageURISource, View} from 'react-native';
+import {Image, ImageURISource, Pressable, View} from 'react-native';
 import {ActivityIndicator} from 'react-native-paper';
 
 import styles from './style';
@@ -7,12 +7,14 @@ import styles from './style';
 interface FixedHeightImageProps {
   source: ImageURISource;
   fixedHeight: number;
+  onPress?: () => void;
   style?: object;
 }
 
 const FixedHeightImage = ({
   source,
   fixedHeight,
+  onPress,
   style,
 }: FixedHeightImageProps) => {
   const [aspectRatio, setAspectRatio] = useState(1);
@@ -41,13 +43,15 @@ const FixedHeightImage = ({
   }
 
   return (
-    <Image
-      source={source}
-      height={fixedHeight}
-      width={fixedHeight * aspectRatio}
-      style={[styles.image, style]}
-      resizeMode="contain"
-    />
+    <Pressable onPress={onPress}>
+      <Image
+        source={source}
+        height={fixedHeight}
+        width={fixedHeight * aspectRatio}
+        style={[styles.image, style]}
+        resizeMode="contain"
+      />
+    </Pressable>
   );
 };
 
