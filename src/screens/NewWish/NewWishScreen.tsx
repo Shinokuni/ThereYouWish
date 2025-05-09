@@ -14,6 +14,7 @@ import {
   Chip,
   HelperText,
   IconButton,
+  Snackbar,
   Surface,
   Text,
   TextInput,
@@ -362,6 +363,12 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
         title={t('analyzing_content')}
         visible={viewModel.isLoadingDialogVisible}
       />
+
+      <Snackbar
+        visible={viewModel.isErrorSnackBarVisible}
+        onDismiss={() => viewModel.setErrorSnackBarVisible(false)}>
+        {t('error_occured_link')}
+      </Snackbar>
 
       <AlertDialog
         title={t('no_collection')}

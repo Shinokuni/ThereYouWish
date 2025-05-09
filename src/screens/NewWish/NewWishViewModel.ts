@@ -66,6 +66,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
   const [isNoCollectionDialogVisible, setNoCollectionDialogVisible] =
     useState(false);
 
+  const [isErrorSnackBarVisible, setErrorSnackBarVisible] = useState(false);
+
   const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
     setTags(newTags);
@@ -236,21 +238,26 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     const response = await fetch(newLink);
     const text = await response.text();
 
-    const result = new HtmlParser().parse(text);
+    try {
+      const result = new HtmlParser().parse(text);
 
-    setTitle(result.title ? result.title : '');
-    setDescription(result.description ? result.description : '');
-    setPrice(result.price ? result.price : '');
+      setTitle(result.title ? result.title : '');
+      setDescription(result.description ? result.description : '');
+      setPrice(result.price ? result.price : '');
 
-    if (result.url) {
-      setLinks([...links, new URL(result.url)]);
+      if (result.url) {
+        setLinks([...links, new URL(result.url)]);
+      }
+
+      if (result.imageUrl) {
+        setImages([...images, result.imageUrl]);
+      }
+    } catch (error) {
+      console.log(error);
+      setErrorSnackBarVisible(true);
+    } finally {
+      setLoadingDialogVisible(false);
     }
-
-    if (result.imageUrl) {
-      setImages([...images, result.imageUrl]);
-    }
-
-    setLoadingDialogVisible(false);
   };
 
   return {
@@ -289,6 +296,8 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     isLoadingDialogVisible,
     isNoCollectionDialogVisible,
     setNoCollectionDialogVisible,
+    isErrorSnackBarVisible,
+    setErrorSnackBarVisible,
     parseLink,
   };
 };
