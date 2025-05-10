@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ThereYouWish</string>
+    <string name="app_name" translatable="false">ThereYouWish</string>
+    <string name="new_wish">New wish</string>
 </resources>

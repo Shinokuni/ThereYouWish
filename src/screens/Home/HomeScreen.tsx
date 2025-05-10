@@ -11,6 +11,8 @@ import {WishState} from '../../contexts/DrawerContext';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 import {useTranslation} from 'react-i18next';
 import AlertDialog from '../../components/AlertDialog/AlertDialog';
+import NativeAndroidShareIntent from '../../specs/NativeAndroidShareIntent';
+import Util from '../../util/Util';
 
 type HomeScreenProps = StaticScreenProps<{
   refreshWishes?: boolean;
@@ -22,6 +24,23 @@ const HomeScreen = ({route}: HomeScreenProps) => {
   const {t} = useTranslation();
 
   const viewModel = useHomeViewModel();
+
+  useEffect(() => {
+    const initialSharedText = NativeAndroidShareIntent.getInitialSharedText();
+    if (initialSharedText) {
+      if (Util.isStringUrl(initialSharedText)) {
+        navigation.navigate('NewWish', {url: initialSharedText});
+      }
+    }
+  }, [navigation]);
+
+  useEffect(() => {
+    NativeAndroidShareIntent.onNewIntent(text => {
+      if (Util.isStringUrl(text)) {
+        navigation.navigate('NewWish', {url: text});
+      }
+    });
+  }, [navigation]);
 
   useEffect(() => {
     if (route.params && route.params.refreshWishes) {

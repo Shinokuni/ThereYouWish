@@ -38,6 +38,7 @@ import AlertDialog from '../../components/AlertDialog/AlertDialog';
 
 type NewWishScreenProps = StaticScreenProps<{
   fullWish?: FullWish;
+  url?: string;
 }>;
 
 const NewWishScreen = ({route}: NewWishScreenProps) => {
@@ -47,7 +48,8 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
   const {t} = useTranslation();
 
   const viewModel = useNewWishViewModel({
-    fullWish: route.params ? route.params.fullWish : undefined,
+    fullWish: route.params.fullWish,
+    url: route.params.url,
   });
 
   const [currency] = useMemo(() => getCurrencies(), []);

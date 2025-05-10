@@ -7,12 +7,14 @@ import {entry, image, link, tag, Tag, tagJoin, wish} from '../../db/schema';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
 import HtmlParser from '../../util/HtmlParser';
 import {FullWish} from '../../components/WishItem/WishItem';
+import NativeAndroidShareIntent from '../../specs/NativeAndroidShareIntent';
 
 type NewWishViewModelProps = {
   fullWish?: FullWish;
+  url?: string;
 };
 
-const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
+const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
   const expo = useSQLiteContext();
   const database = useMemo(() => drizzle(expo), [expo]);
   const drawerContext = useDrawerContext();
@@ -233,7 +235,7 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     return true;
   };
 
-  const parseLink = async (newLink: string) => {
+  const parseLink = useCallback(async (newLink: string) => {
     setLoadingDialogVisible(true);
     const response = await fetch(newLink);
     const text = await response.text();
@@ -258,7 +260,19 @@ const useNewWishViewModel = ({fullWish}: NewWishViewModelProps) => {
     } finally {
       setLoadingDialogVisible(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const fetchLink = async () => {
+      if (url) {
+        await parseLink(url);
+        // very important to remove the shared content text after being processed
+        NativeAndroidShareIntent.clearInitialSharedText();
+      }
+    };
+
+    fetchLink();
+  }, [url, parseLink]);
 
   return {
     title,
