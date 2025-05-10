@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {FlatList, SafeAreaView, View} from 'react-native';
+import {SafeAreaView, View} from 'react-native';
 import {StaticScreenProps, useNavigation} from '@react-navigation/native';
 import {ActivityIndicator, Appbar, FAB, Menu, Text} from 'react-native-paper';
 
@@ -13,6 +13,7 @@ import {useTranslation} from 'react-i18next';
 import AlertDialog from '../../components/AlertDialog/AlertDialog';
 import NativeAndroidShareIntent from '../../specs/NativeAndroidShareIntent';
 import Util from '../../util/Util';
+import Animated, {LinearTransition} from 'react-native-reanimated';
 
 type HomeScreenProps = StaticScreenProps<{
   refreshWishes?: boolean;
@@ -82,11 +83,12 @@ const HomeScreen = ({route}: HomeScreenProps) => {
           <ActivityIndicator size={'large'} />
         </View>
       ) : viewModel.wishes.length > 0 ? (
-        <FlatList
+        <Animated.FlatList
           data={viewModel.wishes}
           style={style.list}
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item.wish.id.toString()}
+          itemLayoutAnimation={LinearTransition}
           renderItem={({item}) => (
             <WishItem
               fullWish={item}
