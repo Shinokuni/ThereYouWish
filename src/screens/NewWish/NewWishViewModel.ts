@@ -5,9 +5,11 @@ import {drizzle} from 'drizzle-orm/expo-sqlite';
 
 import {entry, image, link, tag, Tag, tagJoin, wish} from '../../db/schema';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
-import HtmlParser from '../../util/HtmlParser';
+import HtmlParser, {ParsingResult} from '../../util/HtmlParser';
 import {FullWish} from '../../components/WishItem/WishItem';
 import NativeAndroidShareIntent from '../../specs/NativeAndroidShareIntent';
+import AmazonScrapper from '../../util/AmazonScrapper';
+import Util from '../../util/Util';
 
 type NewWishViewModelProps = {
   fullWish?: FullWish;
@@ -241,7 +243,12 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
     const text = await response.text();
 
     try {
-      const result = new HtmlParser().parse(text);
+      let result: ParsingResult;
+      if (Util.getURLrootDomain(newLink) === 'amazon') {
+        result = new AmazonScrapper().scrape(text);
+      } else {
+        result = new HtmlParser().parse(text);
+      }
 
       setTitle(result.title ? result.title : '');
       setDescription(result.description ? result.description : '');
@@ -249,6 +256,8 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
 
       if (result.url) {
         setLinks([...links, new URL(result.url)]);
+      } else {
+        setLinks([...links, new URL(newLink)]);
       }
 
       if (result.images) {

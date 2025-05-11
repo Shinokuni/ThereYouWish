@@ -7,6 +7,14 @@ class Util {
       return false;
     }
   }
+
+  static getURLrootDomain(url: string): string | undefined {
+    const parts = new URL(url).host.split('.');
+
+    if (parts.length > 1) {
+      return parts[parts.length - 2]; // get the before last
+    }
+  }
 }
 
 export default Util;
