@@ -39,7 +39,11 @@
   "no_wish": "Aucun souhait",
   "error_occured_link": "Une erreur est survenue lors du traitement du lien fourni",
   "delete_wish": "Supprimer le souhait",
-  "delete_wish_question": "Voulez-vous supprimer le souhait {{name}}}?",
+  "delete_wish_question": "Voulez-vous supprimer le souhait {{name}}} ?",
   "update_wish_state": "Modifier l'état du souhait",
-  "mark_wish_to": "Marquer le souhait comme {{state}}?"
+  "mark_wish_to": "Marquer le souhait comme {{state}}?",
+  "delete_collection": "Supprimer la collection",
+  "delete_collection_question": "Voulez-vous supprimer la collection {{name}} ?",
+  "delete_tag": "Supprimer le tag",
+  "delete_tag_question": "Voulez-vous supprimer le tag {{name}} ?"
 }

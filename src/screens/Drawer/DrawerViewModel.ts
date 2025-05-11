@@ -1,21 +1,27 @@
 import {useSQLiteContext} from 'expo-sqlite';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {drizzle, useLiveQuery} from 'drizzle-orm/expo-sqlite';
-import {collection, tag, tagJoin} from '../../db/schema';
+import {Collection, collection, Tag, tag} from '../../db/schema';
 import {eq} from 'drizzle-orm';
 import useDrawerContext from '../../contexts/DrawerContext';
+
+export enum DialogAction {
+  deleteTag = 'deleteTag',
+  deleteCollection = 'deleteCollection',
+  renameCollection = 'renameCollection',
+  renameTag = 'renameTag',
+}
 
 const useDrawerViewModel = () => {
   const expo = useSQLiteContext();
   const database = useMemo(() => drizzle(expo), [expo]);
   const drawerContext = useDrawerContext();
 
-  const [isRenameDialogVisible, setIsRenameDialogVisible] = useState(false);
-  const [renameValue, setRenameValue] = useState('');
-  const [renameId, setRenameId] = useState(0);
-  const [renameType, setRenameType] = useState<'tag' | 'collection' | null>(
+  const [dialogAction, setDialogAction] = useState<DialogAction | null>(null);
+  const [selectedEntity, setSelectedEntity] = useState<Collection | Tag | null>(
     null,
   );
+  const [renameValue, setRenameValue] = useState('');
 
   const collections = useLiveQuery(database.select().from(collection)).data;
   const tags = useLiveQuery(database.select().from(tag)).data;
@@ -81,17 +87,15 @@ const useDrawerViewModel = () => {
     tags,
     deleteTag,
     deleteCollection,
-    isRenameDialogVisible,
-    setIsRenameDialogVisible,
     renameValue,
     setRenameValue,
-    renameType,
-    setRenameType,
     renameCollection,
     renameTag,
-    renameId,
-    setRenameId,
     updateCurrentCollection,
+    dialogAction,
+    setDialogAction,
+    selectedEntity,
+    setSelectedEntity,
   };
 };
 
