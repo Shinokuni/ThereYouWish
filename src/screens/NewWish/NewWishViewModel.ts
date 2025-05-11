@@ -238,11 +238,17 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
   };
 
   const parseLink = useCallback(async (newLink: string) => {
-    setLoadingDialogVisible(true);
-    const response = await fetch(newLink);
-    const text = await response.text();
-
     try {
+      setLoadingDialogVisible(true);
+      const response = await fetch(newLink);
+
+      if (!response.ok) {
+        setErrorSnackBarVisible(true);
+        return;
+      }
+
+      const text = await response.text();
+
       let result: ParsingResult;
       if (Util.getURLrootDomain(newLink) === 'amazon') {
         result = new AmazonScrapper().scrape(text);
