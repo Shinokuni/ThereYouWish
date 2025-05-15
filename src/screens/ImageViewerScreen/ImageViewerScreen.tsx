@@ -6,6 +6,7 @@ import {Appbar} from 'react-native-paper';
 import AutoSizeImage from '../../components/AutoSizeImage/AutoSizeImage';
 
 import style from './style';
+import {ImageZoom} from '@likashefqet/react-native-image-zoom';
 
 type ImageViewerScreenProps = StaticScreenProps<{
   images: string[];
@@ -42,7 +43,7 @@ const ImageViewerScreen = ({route}: ImageViewerScreenProps) => {
             setIndex(Math.round(absolute))
           }
           renderItem={({index}) => (
-            <AutoSizeImage source={route.params.images[index]} />
+            <ImageZoom uri={route.params.images[index]} isDoubleTapEnabled />
           )}
         />
       </View>

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.1.2",
+    "@likashefqet/react-native-image-zoom": "^4.3.0",
     "@react-native-documents/picker": "^10.1.2",
     "@react-native-vector-icons/common": "^11.0.0",
     "@react-native-vector-icons/material-design-icons": "^7.4.47",
