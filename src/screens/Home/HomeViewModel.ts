@@ -76,7 +76,8 @@ const useHomeViewModel = () => {
             ? eq(tagJoin.tagId, drawerContext!!.drawerState.tagId)
             : undefined,
         ),
-      ),
+      )
+      .orderBy(wish.name),
     [drawerContext!!.drawerState],
   );
 
