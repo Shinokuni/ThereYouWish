@@ -1,7 +1,14 @@
-import React, {useEffect} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  SafeAreaView,
+  View,
+} from 'react-native';
 import {StaticScreenProps, useNavigation} from '@react-navigation/native';
 import {ActivityIndicator, Appbar, FAB, Menu, Text} from 'react-native-paper';
+import {useTranslation} from 'react-i18next';
+import Animated, {LinearTransition} from 'react-native-reanimated';
 
 import style from './style';
 import WishItem from '../../components/WishItem/WishItem';
@@ -9,11 +16,9 @@ import useGlobalStyle from '../../components/globalStyle';
 import useHomeViewModel, {DialogAction} from './HomeViewModel';
 import {WishState} from '../../contexts/DrawerContext';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
-import {useTranslation} from 'react-i18next';
 import AlertDialog from '../../components/AlertDialog/AlertDialog';
 import NativeAndroidShareIntent from '../../specs/NativeAndroidShareIntent';
 import Util from '../../util/Util';
-import Animated, {LinearTransition} from 'react-native-reanimated';
 
 type HomeScreenProps = StaticScreenProps<{
   refreshWishes?: boolean;
@@ -25,6 +30,21 @@ const HomeScreen = ({route}: HomeScreenProps) => {
   const {t} = useTranslation();
 
   const viewModel = useHomeViewModel();
+
+  const [fabVisible, setFabVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const currentScrollY = event.nativeEvent.contentOffset.y;
+
+    if (currentScrollY > lastScrollY && fabVisible) {
+      setFabVisible(false);
+    } else if (currentScrollY < lastScrollY && !fabVisible) {
+      setFabVisible(true);
+    }
+
+    setLastScrollY(currentScrollY);
+  };
 
   useEffect(() => {
     const initialSharedText = NativeAndroidShareIntent.getInitialSharedText();
@@ -86,6 +106,7 @@ const HomeScreen = ({route}: HomeScreenProps) => {
         <Animated.FlatList
           data={viewModel.wishes}
           style={style.list}
+          onScroll={handleScroll}
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item.wish.id.toString()}
           itemLayoutAnimation={LinearTransition}
@@ -128,11 +149,13 @@ const HomeScreen = ({route}: HomeScreenProps) => {
         }}
       />
 
-      <FAB
-        style={style.fab}
-        icon={'plus'}
-        onPress={() => navigation.navigate('NewWish', {})}
-      />
+      {fabVisible && (
+        <FAB
+          style={style.fab}
+          icon={'plus'}
+          onPress={() => navigation.navigate('NewWish', {})}
+        />
+      )}
 
       {(() => {
         switch (viewModel.dialogAction) {
