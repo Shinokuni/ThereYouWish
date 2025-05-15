@@ -7,7 +7,11 @@ import {
   TextInput as RNTextInput,
   KeyboardAvoidingView,
 } from 'react-native';
-import {StaticScreenProps, useNavigation} from '@react-navigation/native';
+import {
+  StaticScreenProps,
+  useNavigation,
+  usePreventRemove,
+} from '@react-navigation/native';
 import {
   Appbar,
   Button,
@@ -29,7 +33,7 @@ import TagBottomSheet from '../../components/TagBottomSheet/TagBottomSheet';
 import {BottomSheetModal} from '@gorhom/bottom-sheet';
 import WishLinks from '../../components/WishLinks/WishLinks';
 import WishImages from '../../components/WishImages/WishImages';
-import useNewWishViewModel from './NewWishViewModel';
+import useNewWishViewModel, {DialogAction} from './NewWishViewModel';
 import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 import {FullWish} from '../../components/WishItem/WishItem';
 import LoadingDialog from '../../components/LoadingDialog/LoadingDialog';
@@ -58,6 +62,15 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
   const descriptionRef = useRef<RNTextInput>(null);
   const priceRef = useRef<RNTextInput>(null);
   const bottomSheetRef = useRef<BottomSheetModal | null>(null);
+
+  usePreventRemove(!viewModel.canGoBack(), ({data}) => {
+    if (viewModel.validExit) {
+      navigation.dispatch(data.action);
+    } else {
+      viewModel.setNavigationAction(data.action);
+      viewModel.setDialogAction(DialogAction.backConfirmation);
+    }
+  });
 
   return (
     <SafeAreaView style={globalStyle.screenContainer}>
@@ -311,12 +324,15 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
               if (viewModel.checkFields()) {
                 if (route.params.fullWish) {
                   await viewModel.updateWish();
+
+                  viewModel.validExit = true;
                   navigation.popTo('Drawer', {
                     screen: 'Home',
                     params: {refreshWishes: true},
                   });
                 } else {
                   if (await viewModel.insertWish()) {
+                    viewModel.validExit = true;
                     navigation.goBack();
                   }
                 }
@@ -344,6 +360,26 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
           }
         }}
       />
+
+      {(() => {
+        switch (viewModel.dialogAction) {
+          case DialogAction.backConfirmation:
+            return (
+              <AlertDialog
+                title={t('exit')}
+                text={t('exit_question')}
+                visible={true}
+                onDismiss={() => viewModel.setDialogAction(null)}
+                onValidate={() => {
+                  viewModel.setDialogAction(null);
+                  navigation.dispatch(viewModel.navigationAction!!);
+                }}
+              />
+            );
+          default:
+            return <View />;
+        }
+      })()}
 
       <TextInputDialog
         title={t('generate_infos_link')}

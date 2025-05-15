@@ -10,6 +10,13 @@ import {FullWish} from '../../components/WishItem/WishItem';
 import NativeAndroidShareIntent from '../../specs/NativeAndroidShareIntent';
 import AmazonScrapper from '../../util/AmazonScrapper';
 import Util from '../../util/Util';
+import {NavigationAction} from '@react-navigation/native';
+
+export enum DialogAction {
+  loading = 'loading',
+  parseLink = 'parseLink',
+  backConfirmation = 'backConfirmation',
+}
 
 type NewWishViewModelProps = {
   fullWish?: FullWish;
@@ -72,6 +79,11 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
 
   const [isErrorSnackBarVisible, setErrorSnackBarVisible] = useState(false);
 
+  const [dialogAction, setDialogAction] = useState<DialogAction | null>(null);
+  const [navigationAction, setNavigationAction] =
+    useState<NavigationAction | null>(null);
+  let validExit = false;
+
   const loadTags = useCallback(async () => {
     const newTags = await database.select().from(tag);
     setTags(newTags);
@@ -92,6 +104,37 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
     } else {
       setTitleError(true);
       return false;
+    }
+  };
+
+  const canGoBack = () => {
+    if (fullWish) {
+      // update state
+      const fulLEntry = fullWish.entries[0];
+      const entry = fulLEntry.entry;
+
+      return (
+        title === entry.name &&
+        description === entry.description &&
+        price === (entry.price ? entry.price.toString() : '') &&
+        deadline === entry.deadline &&
+        links.toString() === fulLEntry.links.map(link => link.url).toString() &&
+        selectedTagIds.toString() ===
+          fulLEntry.tags.map(tag => tag.id).toString() &&
+        images.toString() ===
+          fulLEntry.images.map(image => image.url).toString()
+      );
+    } else {
+      // insert state
+      return (
+        title.length === 0 &&
+        description.length === 0 &&
+        price.length === 0 &&
+        deadline === null &&
+        links.length === 0 &&
+        tags.length === 0 &&
+        images.length === 0
+      );
     }
   };
 
@@ -327,7 +370,13 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
     setNoCollectionDialogVisible,
     isErrorSnackBarVisible,
     setErrorSnackBarVisible,
+    dialogAction,
+    setDialogAction,
+    navigationAction,
+    setNavigationAction,
+    validExit,
     parseLink,
+    canGoBack,
   };
 };
 
