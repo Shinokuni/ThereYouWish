@@ -77,16 +77,12 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
       <Appbar.Header>
         <Appbar.Action
           icon="keyboard-backspace"
-          onPress={() => {
-            navigation.goBack();
-          }}
+          onPress={() => navigation.goBack()}
         />
         <Appbar.Content title={t('new_wish')} />
         <Appbar.Action
           icon={'link-plus'}
-          onPress={() => {
-            viewModel.setLinkDialogVisible(true);
-          }}
+          onPress={() => viewModel.setDialogAction(DialogAction.parseLink)}
         />
       </Appbar.Header>
 
@@ -376,46 +372,47 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                 }}
               />
             );
+          case DialogAction.loading:
+            return (
+              <LoadingDialog title={t('analyzing_content')} visible={true} />
+            );
+          case DialogAction.parseLink:
+            return (
+              <TextInputDialog
+                title={t('generate_infos_link')}
+                value={viewModel.linkDialogValue}
+                visible={true}
+                onValueChange={viewModel.setLinkDialogValue}
+                onValidate={async () => {
+                  viewModel.setDialogAction(null);
+                  await viewModel.parseLink(viewModel.linkDialogValue);
+                  viewModel.setLinkDialogValue('');
+                }}
+                onDismiss={() => {
+                  viewModel.setDialogAction(null);
+                  viewModel.setLinkDialogValue('');
+                }}
+              />
+            );
+          case DialogAction.noCollection:
+            return (
+              <AlertDialog
+                title={t('no_collection')}
+                text={t('create_new_collection')}
+                visible={true}
+                onValidate={() => viewModel.setDialogAction(null)}
+              />
+            );
           default:
             return <View />;
         }
       })()}
-
-      <TextInputDialog
-        title={t('generate_infos_link')}
-        value={viewModel.linkDialogValue}
-        visible={viewModel.isLinkDialogVisible}
-        onValueChange={viewModel.setLinkDialogValue}
-        onValidate={async () => {
-          viewModel.setLinkDialogVisible(false);
-          await viewModel.parseLink(viewModel.linkDialogValue);
-          viewModel.setLinkDialogValue('');
-        }}
-        onDismiss={() => {
-          viewModel.setLinkDialogVisible(false);
-          viewModel.setLinkDialogValue('');
-        }}
-      />
-
-      <LoadingDialog
-        title={t('analyzing_content')}
-        visible={viewModel.isLoadingDialogVisible}
-      />
 
       <Snackbar
         visible={viewModel.isErrorSnackBarVisible}
         onDismiss={() => viewModel.setErrorSnackBarVisible(false)}>
         {t('error_occured_link')}
       </Snackbar>
-
-      <AlertDialog
-        title={t('no_collection')}
-        text={t('create_new_collection')}
-        visible={viewModel.isNoCollectionDialogVisible}
-        onValidate={() => {
-          viewModel.setNoCollectionDialogVisible(false);
-        }}
-      />
     </SafeAreaView>
   );
 };

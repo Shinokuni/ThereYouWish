@@ -16,6 +16,7 @@ export enum DialogAction {
   loading = 'loading',
   parseLink = 'parseLink',
   backConfirmation = 'backConfirmation',
+  noCollection = 'noCollection',
 }
 
 type NewWishViewModelProps = {
@@ -70,13 +71,7 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
       : [],
   );
 
-  const [isLinkDialogVisible, setLinkDialogVisible] = useState(false);
   const [linkDialogValue, setLinkDialogValue] = useState('');
-
-  const [isLoadingDialogVisible, setLoadingDialogVisible] = useState(false);
-  const [isNoCollectionDialogVisible, setNoCollectionDialogVisible] =
-    useState(false);
-
   const [isErrorSnackBarVisible, setErrorSnackBarVisible] = useState(false);
 
   const [dialogAction, setDialogAction] = useState<DialogAction | null>(null);
@@ -227,7 +222,7 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
 
   const insertWish = async () => {
     if (drawerContext!!.drawerState.collectionId === -1) {
-      setNoCollectionDialogVisible(true);
+      setDialogAction(DialogAction.noCollection);
       return false;
     }
 
@@ -282,7 +277,7 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
 
   const parseLink = useCallback(async (newLink: string) => {
     try {
-      setLoadingDialogVisible(true);
+      setDialogAction(DialogAction.loading);
       const response = await fetch(newLink);
 
       if (!response.ok) {
@@ -316,7 +311,7 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
       console.log(error);
       setErrorSnackBarVisible(true);
     } finally {
-      setLoadingDialogVisible(false);
+      setDialogAction(null);
     }
   }, []);
 
@@ -361,13 +356,8 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
     checkFields,
     insertWish,
     updateWish,
-    isLinkDialogVisible,
-    setLinkDialogVisible,
     linkDialogValue,
     setLinkDialogValue,
-    isLoadingDialogVisible,
-    isNoCollectionDialogVisible,
-    setNoCollectionDialogVisible,
     isErrorSnackBarVisible,
     setErrorSnackBarVisible,
     dialogAction,
