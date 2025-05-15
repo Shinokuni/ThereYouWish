@@ -43,7 +43,7 @@
   "update_wish_state": "Modifier l'état du souhait",
   "mark_wish_to": "Marquer le souhait comme {{state}}?",
   "delete_collection": "Supprimer la collection",
-  "delete_collection_question": "Voulez-vous supprimer la collection {{name}} ?",
+  "delete_collection_question": "Voulez-vous supprimer la collection {{name}} ? Tous les souhaits associés seront également supprimés.",
   "delete_tag": "Supprimer le tag",
   "delete_tag_question": "Voulez-vous supprimer le tag {{name}} ?",
   "exit": "Sortie",
