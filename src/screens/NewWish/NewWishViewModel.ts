@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useSQLiteContext} from 'expo-sqlite';
 import {and, eq, inArray} from 'drizzle-orm';
-import {drizzle} from 'drizzle-orm/expo-sqlite';
+import {drizzle, useLiveQuery} from 'drizzle-orm/expo-sqlite';
 
 import {entry, image, link, tag, Tag, tagJoin, wish} from '../../db/schema';
 import useDrawerContext, {WishState} from '../../contexts/DrawerContext';
@@ -58,7 +58,6 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
   const [linkValue, setLinkValue] = useState('');
   const [isLinkError, setIsLinkError] = useState(false);
 
-  const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     fullWish?.entries[0].tags
       ? fullWish?.entries[0].tags.map(value => value.id)!!
@@ -79,18 +78,10 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
     useState<NavigationAction | null>(null);
   let validExit = false;
 
-  const loadTags = useCallback(async () => {
-    const newTags = await database.select().from(tag);
-    setTags(newTags);
-  }, [database, setTags]);
-
-  useEffect(() => {
-    loadTags();
-  }, [loadTags]);
+  const tags = useLiveQuery(database.select().from(tag)).data;
 
   const addNewTag = async (name: string) => {
     await database.insert(tag).values({name: name});
-    loadTags();
   };
 
   const checkFields = () => {
@@ -347,7 +338,6 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
     isLinkError,
     setIsLinkError,
     tags,
-    setTags,
     selectedTagIds,
     setSelectedTagIds,
     images,
