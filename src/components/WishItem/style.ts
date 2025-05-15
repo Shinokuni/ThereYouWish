@@ -25,6 +25,7 @@ const style = StyleSheet.create({
     padding: 4,
     borderRadius: 8,
     paddingHorizontal: 8,
+    marginStart: 8,
   },
   tagContainer: {
     flexDirection: 'row',
