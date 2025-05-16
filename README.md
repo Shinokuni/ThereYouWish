@@ -10,16 +10,27 @@
     <a href="https://github.com/Shinokuni/ThereYouWish/releases"><img src="images/get-it-on-github.png" width=250></a>
 </p>
 
-
 # Features
 
-- Create/update/delete your wishes
-- Use collections and tags to order them
-- Extract content from the web to fill your wish (via an url)
+- Create your wish by adding title, description, price, deadline, tags, links and images
+- Use collections and tags to order/filter them
+- Extract content from the web to fill your wish (based on opengraph, twitter cards and json-ld/schema.org metadata)
+
+The app is currently in a preview state and more is to come.
+
+Upcoming features:
+
+- Multiple entries linked to a single wish
+- Be notified when a wish deadline is approaching
+- Backup and restore
+- Custom currency for a wish
+- And more...
 
 # Screenshots
 
-To come.
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width=250> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width=250> <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width=250>
+
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" width=250>
 
 # Credits
 
