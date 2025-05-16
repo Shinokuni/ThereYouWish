@@ -118,7 +118,7 @@ const useNewWishViewModel = ({fullWish, url}: NewWishViewModelProps) => {
         price.length === 0 &&
         deadline === null &&
         links.length === 0 &&
-        tags.length === 0 &&
+        selectedTagIds.length === 0 &&
         images.length === 0
       );
     }
