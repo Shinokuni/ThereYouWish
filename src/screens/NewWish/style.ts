@@ -25,7 +25,7 @@ const style = StyleSheet.create({
     marginEnd: 16,
   },
   dateContainer: {
-    flex: 1,
+    flex: 1.1, // a bit hacky but it just works
   },
   priceDateInput: {
     paddingStart: 0,

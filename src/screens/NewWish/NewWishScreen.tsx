@@ -176,10 +176,20 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                 activeUnderlineColor="transparent"
                 cursorColor={theme.colors.primary}
                 contentStyle={style.priceDateInput}
+                returnKeyType="next"
                 left={
                   <TextInput.Icon icon={`currency-${currency.toLowerCase()}`} />
                 }
-                returnKeyType="next"
+                right={
+                  viewModel.price.length > 0 ? (
+                    <TextInput.Icon
+                      icon="close"
+                      onPress={() => viewModel.setPrice('')}
+                    />
+                  ) : (
+                    <View />
+                  )
+                }
               />
             </View>
 
@@ -212,6 +222,16 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                       }}
                     />
                   }
+                  right={
+                    viewModel.deadline ? (
+                      <TextInput.Icon
+                        icon="close"
+                        onPress={() => viewModel.setDeadline(null)}
+                      />
+                    ) : (
+                      <View />
+                    )
+                  }
                 />
               </Pressable>
 
@@ -220,7 +240,8 @@ const NewWishScreen = ({route}: NewWishScreenProps) => {
                 mode="date"
                 locale={locale.languageCode}
                 open={viewModel.isDatePickerOpen}
-                date={new Date()}
+                minimumDate={new Date()}
+                date={viewModel.deadline ? viewModel.deadline : new Date()}
                 onConfirm={date => {
                   viewModel.setDatePickerOpen(false);
                   viewModel.setDeadline(date);
