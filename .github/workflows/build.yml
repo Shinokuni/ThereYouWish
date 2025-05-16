@@ -30,4 +30,4 @@ jobs:
       - name: build ThereYouWish
         run: |
           cd android
-          ./gradlew build
+          ./gradlew assembleDebug
