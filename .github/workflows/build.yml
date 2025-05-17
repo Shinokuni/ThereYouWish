@@ -32,6 +32,4 @@ jobs:
           cd android
           ./gradlew assembleDebug
       - name: Run tests
-        run: |
-          cd ../
-          npm test
+        run: npm test
