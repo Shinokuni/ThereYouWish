@@ -99,11 +99,14 @@ class HtmlParser {
     if (elements) {
       for (const element of elements) {
         const content = DomUtils.innerText(element.childNodes);
-        if (!content) {
+
+        let jsonLD;
+        try {
+          jsonLD = JSON.parse(content);
+        } catch (err) {
+          console.log(err);
           continue;
         }
-
-        const jsonLD = JSON.parse(content);
 
         if (jsonLD['@type'] !== 'Product') {
           continue;
@@ -139,15 +142,15 @@ class HtmlParser {
           Array.isArray(offer.priceSpecification) &&
           offer.priceSpecification.length > 0
         ) {
-          return offer.priceSpecification[0].price.toString();
+          return offer.priceSpecification[0].price?.toString();
         } else {
-          return offer.priceSpecification.price.toString();
+          return offer.priceSpecification.price?.toString();
         }
       } else {
-        return offer.price.toString();
+        return offer.price?.toString();
       }
     } else {
-      return offers.price.toString();
+      return offers.price?.toString();
     }
   }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {FlatList, Linking, Share, View} from 'react-native';
 import {Card, Chip, IconButton, Text, useTheme} from 'react-native-paper';
 import {getCurrencies, getLocales} from 'react-native-localize';
@@ -12,17 +12,7 @@ import style from './style';
 import DropdownMenu from '../DropdownMenu/DropdownMenu';
 import FixedHeightImage from '../FixedHeightImage/FixedHeightImage';
 import {WishState} from '../../contexts/DrawerContext';
-
-const formatPrice = (price: number) => {
-  const [locale] = getLocales();
-  const [currency] = getCurrencies();
-  return price.toLocaleString(locale.languageCode, {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  });
-};
+import Util from '../../util/Util';
 
 type WishItemProps = {
   fullWish: FullWish;
@@ -59,6 +49,9 @@ const WishItem = ({
   const navigation = useNavigation();
   const {t} = useTranslation();
 
+  const [locale] = useMemo(() => getLocales(), []);
+  const [currency] = useMemo(() => getCurrencies(), []);
+
   return (
     <Card style={{...style.container}}>
       <View style={style.header}>
@@ -74,7 +67,7 @@ const WishItem = ({
             <Text
               variant={'bodyLarge'}
               style={{color: theme.colors.onPrimaryContainer}}>
-              {formatPrice(entry.price)}
+              {Util.formatPrice(entry.price, locale.languageCode, currency)}
             </Text>
           </View>
         )}
@@ -187,7 +180,14 @@ const WishItem = ({
             onPress={() => {
               Share.share({
                 message: `${entry.name}${
-                  entry.price ? ' - ' + formatPrice(entry.price) : ''
+                  entry.price
+                    ? ' - ' +
+                      Util.formatPrice(
+                        entry.price,
+                        locale.languageCode,
+                        currency,
+                      )
+                    : ''
                 }\n${links.length > 0 ? links[0].url : ''}`,
               });
             }}
