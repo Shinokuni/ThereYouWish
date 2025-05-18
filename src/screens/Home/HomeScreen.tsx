@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -19,6 +19,8 @@ import TextInputDialog from '../../components/TextInputDialog/TextInputDialog';
 import AlertDialog from '../../components/AlertDialog/AlertDialog';
 import NativeAndroidShareIntent from '../../specs/NativeAndroidShareIntent';
 import Util from '../../util/Util';
+import FilterBottomSheet from '../../components/FilterBottomSheet/FilterBottomSheet';
+import {BottomSheetModal} from '@gorhom/bottom-sheet';
 
 type HomeScreenProps = StaticScreenProps<{
   refreshWishes?: boolean;
@@ -33,6 +35,8 @@ const HomeScreen = ({route}: HomeScreenProps) => {
 
   const [fabVisible, setFabVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const bottomSheetRef = useRef<BottomSheetModal | null>(null);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const currentScrollY = event.nativeEvent.contentOffset.y;
@@ -79,12 +83,17 @@ const HomeScreen = ({route}: HomeScreenProps) => {
           }}
         />
         <Appbar.Content title={t('wishes')} />
+        <Appbar.Action
+          icon={'filter-variant'}
+          onPress={() => bottomSheetRef.current?.present()}
+        />
         <Menu
           visible={viewModel.isAppbarMenuVisible}
           onDismiss={() => viewModel.setAppbarMenuVisible(false)}
           anchor={
             <Appbar.Action
               icon="dots-vertical"
+              style={style.menu}
               onPress={() => viewModel.setAppbarMenuVisible(true)}
             />
           }>
@@ -196,6 +205,16 @@ const HomeScreen = ({route}: HomeScreenProps) => {
             return <View />;
         }
       })()}
+
+      <FilterBottomSheet
+        ref={bottomSheetRef}
+        orderField={viewModel.orderField}
+        orderType={viewModel.orderType}
+        filterField={viewModel.filterField}
+        onChangeOrderField={viewModel.setOrderField}
+        onChangeOrderType={viewModel.setOrderType}
+        onChangeFilterField={viewModel.setFilterField}
+      />
     </SafeAreaView>
   );
 };

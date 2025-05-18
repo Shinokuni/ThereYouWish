@@ -15,6 +15,9 @@ const style = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  menu: {
+    marginStart: 0,
+  },
 });
 
 export default style;

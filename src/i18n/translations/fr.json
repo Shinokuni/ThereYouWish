@@ -47,5 +47,7 @@
   "delete_tag": "Supprimer le tag",
   "delete_tag_question": "Voulez-vous supprimer le tag {{name}} ?",
   "exit": "Sortie",
-  "exit_question": "Vous avez des changements non-sauvegardés. Êtes-vous sûr de vouloir quitter ?"
+  "exit_question": "Vous avez des changements non-sauvegardés. Êtes-vous sûr de vouloir quitter ?",
+  "name": "Nom",
+  "creation_date": "Date de création"
 }

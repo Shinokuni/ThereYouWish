@@ -47,5 +47,7 @@
   "delete_tag": "Delete tag",
   "delete_tag_question": "Do you want to delete {{name}} tag?",
   "exit": "Exit",
-  "exit_question": "You have some unsaved changes. Are you sure you want to leave?"
+  "exit_question": "You have some unsaved changes. Are you sure you want to leave?",
+  "name": "Name",
+  "creation_date": "Creation date"
 }
